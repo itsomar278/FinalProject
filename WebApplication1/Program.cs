@@ -1,3 +1,5 @@
+using WebApplication1.Models;
+
 namespace WebApplication1
 {
     public class Program
@@ -12,6 +14,7 @@ namespace WebApplication1
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddDbContext<ProjectDbContext>();
 
             var app = builder.Build();
 
