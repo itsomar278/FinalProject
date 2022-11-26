@@ -1,4 +1,4 @@
-using WebApplication1.Models;
+using WebApplication1.Models.DataAccess;
 
 namespace WebApplication1
 {

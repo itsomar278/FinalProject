@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Models.Entites;
 
-namespace WebApplication1.Models
+namespace WebApplication1.Models.DataAccess
 {
     public class ProjectDbContext : DbContext
     {
@@ -12,9 +13,11 @@ namespace WebApplication1.Models
         {
             modelBuilder.Entity<Follow>().
                         HasKey(uu =>
-                        new { uu.FollowerId,
-                              uu.FollowedId
-                            });
+                        new
+                        {
+                            uu.FollowerId,
+                            uu.FollowedId
+                        });
             modelBuilder.Entity<Follow>()
                         .HasOne(u => u.FollowedUser)
                         .WithMany(u => u.Followers)
@@ -26,7 +29,7 @@ namespace WebApplication1.Models
                         .HasForeignKey(u => u.FollowedId)
                         .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Articles>()
-                        .HasOne<Users>(s => s.User)
+                        .HasOne(s => s.User)
                         .WithMany(g => g.PublishedArticles)
                         .IsRequired()
                         .OnDelete(DeleteBehavior.Cascade);
