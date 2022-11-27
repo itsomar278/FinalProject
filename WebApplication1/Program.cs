@@ -1,4 +1,5 @@
 using WebApplication1.Models.DataAccess;
+using WebApplication1.Models.UnitOfWork;
 
 namespace WebApplication1
 {
@@ -15,6 +16,7 @@ namespace WebApplication1
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<ProjectDbContext>();
+            builder.Services.AddScoped<IUnitOfWork ,UnitOfWork>();
 
             var app = builder.Build();
 

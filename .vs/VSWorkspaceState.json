@@ -1,7 +1,12 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\WebApplication1",
+    "\\WebApplication1\\Controllers",
+    "\\WebApplication1\\Models",
+    "\\WebApplication1\\Models\\DataAccess",
+    "\\WebApplication1\\Models\\Entites"
   ],
-  "SelectedNode": "\\C:\\Users\\omar\\Source\\Repos\\FinalProject",
+  "SelectedNode": "\\WebApplication1\\Controllers\\AuthController.cs",
   "PreviewInSolutionExplorer": false
 }

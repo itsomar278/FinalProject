@@ -1,6 +1,8 @@
-﻿namespace WebApplication1.Models.Repositories.FollowRepository
+﻿using WebApplication1.Models.Entites;
+
+namespace WebApplication1.Models.Repositories.FollowRepository
 {
-    public interface IFollowRepository
+    public interface IFollowRepository : IRepository<Follow>
     {
     }
 }

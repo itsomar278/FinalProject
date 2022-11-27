@@ -1,6 +1,8 @@
-﻿namespace WebApplication1.Models.Repositories.CommentsRepository
+﻿using WebApplication1.Models.Entites;
+
+namespace WebApplication1.Models.Repositories.CommentsRepository
 {
-    public interface ICommentsRepository
+    public interface ICommentsRepository : IRepository<Comments>
     {
     }
 }
