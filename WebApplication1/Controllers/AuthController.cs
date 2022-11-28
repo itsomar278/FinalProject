@@ -45,22 +45,21 @@ namespace WebApplication1.Controllers
 		[HttpPost("login")]
         public async Task<ActionResult<Users>> Login(UserLoginRequest request)
 		{
-			 var UsedEmail = _unitOfWork.Users.Find(u => u.UserEmail == request.UserEmail).ToList();
-			if (UsedEmail.Count!=0)
+			var result = _unitOfWork.Users.FindByEmail(request.UserEmail);
+		
+			
+		    if (!string.IsNullOrEmpty(result.UserEmail) || !VerifyPasswordHash(request.Password, result.PasswordHash, result.PasswordSalt))
 			{
-                var user = UsedEmail.First();
-                if (user == null || !VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt))
-                {
-                    return BadRequest("either email is wrong or password");
-                }
-                string token = CreateToken(user);
-
-                return Ok(token);
-            }
+			
+					string token = CreateToken(result);
+					return Ok(token);
+			}
+		
 			else
 			{
-				return BadRequest("user cannot be found");
-			}
+                return BadRequest("either email is wrong or password");
+
+            }
         }
 		private string CreateToken(Users user)
 		{
@@ -68,7 +67,7 @@ namespace WebApplication1.Controllers
 			{ 
 				new Claim(ClaimTypes.Name , user.UserName)
 			};
-			var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("my secret key"));
+			var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("myfinalprojectforts123"));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 			var token = new JwtSecurityToken
 				(

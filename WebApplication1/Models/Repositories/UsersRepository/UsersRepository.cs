@@ -14,9 +14,10 @@ namespace WebApplication1.Models.Repositories.UsersRepository
         {
             get { return _DbContext as ProjectDbContext; }
         }
-        public Users FindByEmail(Expression<Func<Users, bool>> predicate)
+        public Users FindByEmail(string email)
         {
-            return _DbContext.Set<Users>().FirstOrDefault(predicate);
+            var user = _DbContext.Set<Users>().SingleOrDefault(user => user.UserEmail == email);
+            return user;
         }
     }
 }
