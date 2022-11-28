@@ -1,9 +1,8 @@
-﻿using WebApplication1.Models.DataAccess;
-using WebApplication1.Models.Entites;
+﻿using WebApplication1.Models.Entites;
 
-namespace WebApplication1.Models.Repositories.CommentsRepository
+namespace WebApplication1.DataAccess.Repositories.CommentRepository
 {
-    public class CommentsRepository : Repository<Comments> , ICommentsRepository
+    public class CommentsRepository : Repository<Comments>, ICommentsRepository
     {
         public CommentsRepository(ProjectDbContext projectDbContext) : base(projectDbContext)
         {

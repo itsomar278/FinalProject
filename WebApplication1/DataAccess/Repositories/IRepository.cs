@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace WebApplication1.Models.Repositories
+namespace WebApplication1.DataAccess.Repositories
 {
     public interface IRepository<TEntity> where TEntity : class
     {

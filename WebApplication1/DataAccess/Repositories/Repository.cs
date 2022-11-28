@@ -1,14 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace WebApplication1.Models.Repositories
+namespace WebApplication1.DataAccess.Repositories
 {
-    public class Repository<TEntity> :IRepository<TEntity> where TEntity : class
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        protected readonly DbContext _DbContext ;
-        public Repository(DbContext dbContext )
+        protected readonly DbContext _DbContext;
+        public Repository(DbContext dbContext)
         {
-            _DbContext = dbContext ;
+            _DbContext = dbContext;
         }
 
         public void Add(TEntity entity)

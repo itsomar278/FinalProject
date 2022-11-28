@@ -4,12 +4,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using WebApplication1.Models.Entites;
-using WebApplication1.Models.Repositories.UsersRepository;
-using WebApplication1.Models.UnitOfWork;
+using WebApplication1.UnitOfWorks ;
 
 namespace WebApplication1.Controllers
 {
-	[ApiController]
+    [ApiController]
 	[Route("[controller]")]
 	public class AuthController : ControllerBase
 	{
@@ -48,9 +47,8 @@ namespace WebApplication1.Controllers
 			var result = _unitOfWork.Users.FindByEmail(request.UserEmail);
 		
 			
-		    if (!string.IsNullOrEmpty(result.UserEmail) || !VerifyPasswordHash(request.Password, result.PasswordHash, result.PasswordSalt))
+		    if (result != null && VerifyPasswordHash(request.Password, result.PasswordHash, result.PasswordSalt))
 			{
-			
 					string token = CreateToken(result);
 					return Ok(token);
 			}
@@ -58,7 +56,6 @@ namespace WebApplication1.Controllers
 			else
 			{
                 return BadRequest("either email is wrong or password");
-
             }
         }
 		private string CreateToken(Users user)
@@ -88,7 +85,7 @@ namespace WebApplication1.Controllers
 		}
 		private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
 		{
-            using (var hmac = new HMACSHA512())
+            using (var hmac = new HMACSHA512(passwordSalt))
             {
 				var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
 				return computedHash == passwordHash;

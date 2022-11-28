@@ -1,9 +1,8 @@
 ﻿using System.Linq;
 using System.Linq.Expressions;
-using WebApplication1.Models.DataAccess;
 using WebApplication1.Models.Entites;
 
-namespace WebApplication1.Models.Repositories.UsersRepository
+namespace WebApplication1.DataAccess.Repositories.UsersRepository
 {
     public class UsersRepository : Repository<Users>, IUsersRepository
     {
