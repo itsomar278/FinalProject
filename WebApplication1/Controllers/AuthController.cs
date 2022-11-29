@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using WebApplication1.Models.Entites;
+using WebApplication1.Services.Authentication;
 using WebApplication1.UnitOfWorks ;
 
 namespace WebApplication1.Controllers
@@ -13,9 +14,12 @@ namespace WebApplication1.Controllers
 	public class AuthController : ControllerBase
 	{
 		private readonly IUnitOfWork _unitOfWork;
-	    public AuthController(IUnitOfWork unitOfWork)
+		private readonly IAuthinticateService _authinticateService;
+
+        public AuthController(IUnitOfWork unitOfWork , IAuthinticateService authinticateService)
 		{
             _unitOfWork = unitOfWork;
+            _authinticateService = authinticateService;
 
         }
 		[HttpPost("register")]
@@ -23,13 +27,11 @@ namespace WebApplication1.Controllers
 		{
 			var usedUserName = _unitOfWork.Users.Find(u => u.UserName == request.UserName).ToList();
 			var UsedEmail = _unitOfWork.Users.Find(u => u.UserEmail == request.UserEmail).ToList();
-
             if (usedUserName.Count!=0|| UsedEmail.Count!=0)
 			{ 
                 return BadRequest("Email or User Name has been used before");
 			}
-
-			CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+            _authinticateService.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 			var user = new Users
 			{
 				UserEmail= request.UserEmail,
@@ -44,51 +46,32 @@ namespace WebApplication1.Controllers
 		[HttpPost("login")]
         public async Task<ActionResult<Users>> Login(UserLoginRequest request)
 		{
-			var result = _unitOfWork.Users.FindByEmail(request.UserEmail);
-		
-			
-		    if (result != null && VerifyPasswordHash(request.Password, result.PasswordHash, result.PasswordSalt))
+			var userResult = _unitOfWork.Users.FindByEmail(request.UserEmail);
+			var refreshTokenResult = _unitOfWork.RefreshTokens.Find(t => t.UserId == userResult.UserId);
+			if (refreshTokenResult.Count()!=0 ) 
 			{
-					string token = CreateToken(result);
-					return Ok(token);
+				_unitOfWork.RefreshTokens.RemoveRange(refreshTokenResult);
+				_unitOfWork.complete();
 			}
-		
+		    if (userResult != null && _authinticateService.VerifyPasswordHash(request.Password, userResult.PasswordHash, userResult.PasswordSalt))
+			{
+			    string token = _authinticateService.CreateToken(userResult);
+				RefreshTokens refreshToken = _authinticateService.GenerateRefreshToken(userResult.UserId);
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Expires = refreshToken.Expires
+                };
+                Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
+                _unitOfWork.RefreshTokens.Add(refreshToken);
+                _unitOfWork.complete();
+                _unitOfWork.Users.UpdateUserRefreshToken(userResult, refreshToken.TokenId);
+				_unitOfWork.complete();
+                return Ok(token);
+			}
 			else
 			{
                 return BadRequest("either email is wrong or password");
-            }
-        }
-		private string CreateToken(Users user)
-		{
-			List<Claim> claims = new List<Claim>
-			{ 
-				new Claim(ClaimTypes.Name , user.UserName)
-			};
-			var key = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes("myfinalprojectforts123"));
-			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-			var token = new JwtSecurityToken
-				(
-				claims: claims,
-				expires: DateTime.Now.AddDays(1),
-				signingCredentials: creds
-				);
-			var jwt = new JwtSecurityTokenHandler().WriteToken(token);
-			return jwt; 
-		}
-		private void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt)
-		{
-			using (var hmac = new HMACSHA512())
-			{
-				passwordSalt = hmac.Key;
-				passwordHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-			}
-		}
-		private bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
-		{
-            using (var hmac = new HMACSHA512(passwordSalt))
-            {
-				var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-				return computedHash == passwordHash;
             }
         }
 	}

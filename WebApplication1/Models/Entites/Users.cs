@@ -12,6 +12,7 @@ namespace WebApplication1.Models.Entites
             FavoriteArticles = new List<Articles>();
             Followers = new List<Follow>();
             Following = new List<Follow>();
+            RefreshToken = new RefreshTokens();
         }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

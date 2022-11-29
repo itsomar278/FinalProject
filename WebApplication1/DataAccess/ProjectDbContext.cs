@@ -9,6 +9,7 @@ namespace WebApplication1.DataAccess
         public DbSet<Comments> Comments { get; set; }
         public DbSet<Articles> Articles { get; set; }
         public DbSet<Follow> Follows { get; set; }
+        public DbSet<RefreshTokens> RefreshTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Follow>().

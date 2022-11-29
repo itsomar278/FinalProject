@@ -18,5 +18,9 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
             var user = _DbContext.Set<Users>().SingleOrDefault(user => user.UserEmail == email);
             return user;
         }
+        public void UpdateUserRefreshToken(Users user ,int refreshTokenId)
+        {
+            user.RefreshTokenId = refreshTokenId;
+        }
     }
 }

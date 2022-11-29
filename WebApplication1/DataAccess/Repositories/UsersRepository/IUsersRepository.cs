@@ -6,5 +6,7 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
     public interface IUsersRepository : IRepository<Users>
     {
         public Users FindByEmail(string email);
+        public void UpdateUserRefreshToken(Users user, int refreshTokenId);
+
     }
 }
