@@ -37,6 +37,10 @@ namespace WebApplication1.DataAccess
                         .HasOne(u => u.User).WithMany()
                         .HasForeignKey(u => u.UserId)
                         .OnDelete(DeleteBehavior.ClientSetNull);
+            modelBuilder.Entity<Users>()
+                        .HasOne(u => u.RefreshToken)
+                        .WithOne(t => t.User)
+                        .HasForeignKey<RefreshTokens>(t=>t.UserId);
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

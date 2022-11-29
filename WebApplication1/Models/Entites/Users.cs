@@ -26,6 +26,8 @@ namespace WebApplication1.Models.Entites
         public byte[] PasswordHash { get; set; }
         [Required]
         public byte[] PasswordSalt { get; set; }
+        public int? RefreshTokenId { get; set; }
+        public RefreshTokens? RefreshToken { get; set; }
         public List<Articles> PublishedArticles { get; set; }
         public List<Articles> FavoriteArticles { get; set; }
         public List<Follow> Followers { get; set; }
