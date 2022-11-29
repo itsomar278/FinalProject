@@ -14,7 +14,6 @@ namespace WebApplication1
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
@@ -45,7 +44,6 @@ namespace WebApplication1
             ValidateAudience = false
         };
     });
-
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -60,8 +58,6 @@ namespace WebApplication1
             app.UseAuthentication();
 
             app.UseAuthorization();
-
-           
 
             app.MapControllers();
 

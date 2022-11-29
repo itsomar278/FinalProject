@@ -4,6 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using WebApplication1.Models.Entites;
+using WebApplication1.Models.Requests;
 using WebApplication1.UnitOfWorks;
 
 namespace WebApplication1.Controllers

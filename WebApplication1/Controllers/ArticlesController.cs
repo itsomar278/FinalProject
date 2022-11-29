@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebApplication1.Models.Entites;
+using WebApplication1.Models.Requests;
 using WebApplication1.UnitOfWorks;
 
 namespace WebApplication1.Controllers
@@ -20,7 +21,7 @@ namespace WebApplication1.Controllers
         public async Task<ActionResult<Articles>> PostArticle(ArticlePostRequest request)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            if(string.IsNullOrEmpty(userEmail))
+            if(string.IsNullOrEmpty(userEmail)) // extra check to delete 
             {
                 return BadRequest();
             }

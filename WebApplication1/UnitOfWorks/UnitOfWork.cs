@@ -10,7 +10,7 @@ namespace WebApplication1.UnitOfWorks
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ProjectDbContext _projectDbContext;
-        public UnitOfWork(ProjectDbContext projectDbContext)
+        public UnitOfWork(ProjectDbContext projectDbContext) // injection via c
         {
             _projectDbContext = projectDbContext;
             Follows = new FollowRepository(_projectDbContext);

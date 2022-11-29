@@ -5,7 +5,7 @@ namespace WebApplication1.DataAccess.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        protected readonly DbContext _DbContext;
+        protected readonly DbContext _DbContext; // of type interface **
         public Repository(DbContext dbContext)
         {
             _DbContext = dbContext;
