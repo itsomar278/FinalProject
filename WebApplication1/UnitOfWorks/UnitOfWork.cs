@@ -11,7 +11,7 @@ namespace WebApplication1.UnitOfWorks
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ProjectDbContext _projectDbContext;
-        public UnitOfWork(ProjectDbContext projectDbContext)
+        public UnitOfWork(ProjectDbContext projectDbContext )
         {
             _projectDbContext = projectDbContext;
             Follows = new FollowRepository(_projectDbContext);
@@ -20,7 +20,7 @@ namespace WebApplication1.UnitOfWorks
             Users = new UsersRepository(_projectDbContext);
             RefreshTokens = new RefreshTokensRepository(_projectDbContext);
         }
-        public IFollowRepository Follows { get; private set; }
+        public   IFollowRepository Follows { get; private set; }
         public IArticleRepository Articles { get; private set; }
         public ICommentsRepository Comments { get; private set; }
         public IUsersRepository Users { get; private set; }

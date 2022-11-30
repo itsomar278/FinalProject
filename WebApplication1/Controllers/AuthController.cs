@@ -1,6 +1,9 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using WebApplication1.Models.Entites;
@@ -74,5 +77,57 @@ namespace WebApplication1.Controllers
                 return BadRequest("either email is wrong or password");
             }
         }
-	}
+		[HttpPost("refresh"),Authorize]
+        public async Task<ActionResult<string>> RefreshToken()
+		{
+			var refreshToken = Request.Cookies["refreshToken"];
+			var userEmail = User.FindFirstValue(ClaimTypes.Email);
+			var user = _unitOfWork.Users.Find(u => u.UserEmail == userEmail).FirstOrDefault();
+			if (user!=null)
+			{
+		       	var myRefreshToken = _unitOfWork.RefreshTokens.Get(user.RefreshTokenId.Value);
+				if(myRefreshToken.Token!=refreshToken|| myRefreshToken.Expires < DateTime.Now)
+				{
+					return Unauthorized("invalid refresh token");
+				}
+				else
+				{
+					string token = _authinticateService.CreateToken(user);
+                    var newRefreshToken = _authinticateService.GenerateRefreshToken(user.UserId);
+                    var cookieOptions = new CookieOptions
+                    {
+                        HttpOnly = true,
+                        Expires = newRefreshToken.Expires
+                    };
+                    Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
+					_unitOfWork.RefreshTokens.Add(newRefreshToken); ;
+					_unitOfWork.complete();
+					_unitOfWork.Users.UpdateUserRefreshToken(user, newRefreshToken.TokenId);
+                    _unitOfWork.complete();
+					return Ok("refreshed");
+
+                }
+
+
+            }
+			else
+			{
+				return BadRequest();
+			}
+				
+			
+
+
+
+        }
+        [HttpPost("logout"), Authorize]
+        public async Task<ActionResult<string>> Logout()
+		{
+			var userToLogout = _unitOfWork.Users.FindByEmail(User.FindFirstValue(ClaimTypes.Email));
+			var tokensToDelete = _unitOfWork.RefreshTokens.Find(rt => rt.UserId == userToLogout.UserId);
+			_unitOfWork.RefreshTokens.RemoveRange(tokensToDelete);
+            _unitOfWork.complete();
+			return Ok("user loged out succesfully");
+		}
+    }
 }

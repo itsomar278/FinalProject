@@ -29,7 +29,7 @@ namespace WebApplication1.Services.Authentication
             var token = new JwtSecurityToken
                 (
                 claims: claims,
-                expires: DateTime.Now.AddDays(1),
+                expires: DateTime.Now.AddMinutes(5),
                 signingCredentials: creds
                 );
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
