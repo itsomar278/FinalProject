@@ -45,7 +45,7 @@ namespace WebApplication1.DataAccess
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer(@"Data Source=DESKTOP-D57N26P;Initial Catalog=FinalProject;Integrated Security=True");
+            optionsBuilder.UseSqlServer(@"Data Source=DESKTOP-D57N26P;Initial Catalog=FinalProject;Integrated Security=True;MultipleActiveResultSets=true");
         }
     }
 }

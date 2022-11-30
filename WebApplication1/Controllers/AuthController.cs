@@ -7,6 +7,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using WebApplication1.Models.Entites;
+using WebApplication1.Models.Requests;
 using WebApplication1.Services.Authentication;
 using WebApplication1.UnitOfWorks ;
 
@@ -105,20 +106,12 @@ namespace WebApplication1.Controllers
 					_unitOfWork.Users.UpdateUserRefreshToken(user, newRefreshToken.TokenId);
                     _unitOfWork.complete();
 					return Ok("refreshed");
-
                 }
-
-
             }
 			else
 			{
 				return BadRequest();
 			}
-				
-			
-
-
-
         }
         [HttpPost("logout"), Authorize]
         public async Task<ActionResult<string>> Logout()
