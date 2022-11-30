@@ -45,8 +45,8 @@ namespace WebApplication1.Controllers
 			_unitOfWork.Users.Add(user);
             _unitOfWork.complete();
             return Ok(user);
-		}
-		[HttpPost("login")]
+        }
+        [HttpPost("login")]
         public async Task<ActionResult<Users>> Login(UserLoginRequest request)
 		{
 			var userResult = _unitOfWork.Users.FindByEmail(request.UserEmail);
