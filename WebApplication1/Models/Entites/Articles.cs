@@ -8,6 +8,7 @@ namespace WebApplication1.Models.Entites
         public Articles()
         {
             Comments = new List<Comments>();
+            FavouredBy = new List<Favorite>();
         }
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
@@ -19,6 +20,7 @@ namespace WebApplication1.Models.Entites
         public string Content { get; set; } = string.Empty;
         public int UserId { get; set; }
         public Users User { get; set; }
+        public List<Favorite> FavouredBy { get; set; }
         public List<Comments> Comments { get; set; }
 
     }

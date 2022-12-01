@@ -9,7 +9,7 @@ namespace WebApplication1.Models.Entites
         public Users()
         {
             PublishedArticles = new List<Articles>();
-            FavoriteArticles = new List<Articles>();
+            FavoriteArticles = new List<Favorite>();
             Followers = new List<Follow>();
             Following = new List<Follow>();
             RefreshToken = new RefreshTokens();
@@ -30,7 +30,7 @@ namespace WebApplication1.Models.Entites
         public int? RefreshTokenId { get; set; }
         public RefreshTokens? RefreshToken { get; set; }
         public List<Articles> PublishedArticles { get; set; }
-        public List<Articles> FavoriteArticles { get; set; }
+        public List<Favorite> FavoriteArticles { get; set; }
         public List<Follow> Followers { get; set; }
         public List<Follow> Following { get; set; }
     }

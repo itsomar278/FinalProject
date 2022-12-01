@@ -10,8 +10,21 @@ namespace WebApplication1.DataAccess
         public DbSet<Articles> Articles { get; set; }
         public DbSet<Follow> Follows { get; set; }
         public DbSet<RefreshTokens> RefreshTokens { get; set; }
+        public DbSet<Favorite> Favorites { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Favorite>()
+                .HasKey(ua => new { ua.ArticleId ,ua.UserId });
+            modelBuilder.Entity<Favorite>()
+                        .HasOne<Users>(f => f.User)
+                        .WithMany(u => u.FavoriteArticles)
+                        .HasForeignKey(f => f.UserId)
+                        .OnDelete(DeleteBehavior.Restrict); ;
+            modelBuilder.Entity<Favorite>()
+                       .HasOne<Articles>(f => f.Article)
+                       .WithMany(a => a.FavouredBy)
+                       .HasForeignKey(f => f.ArticleId)
+                       .OnDelete(DeleteBehavior.Restrict);
             modelBuilder.Entity<Follow>().
                         HasKey(uu =>
                         new
