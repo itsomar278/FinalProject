@@ -4,6 +4,11 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
 using WebApplication1.DataAccess;
+using WebApplication1.DataAccess.Repositories.ArticleRepository;
+using WebApplication1.DataAccess.Repositories.CommentRepository;
+using WebApplication1.DataAccess.Repositories.FollowRepository;
+using WebApplication1.DataAccess.Repositories.RefreshTokenRepository;
+using WebApplication1.DataAccess.Repositories.UsersRepository;
 using WebApplication1.Services.Authentication;
 using WebApplication1.UnitOfWorks;
 
