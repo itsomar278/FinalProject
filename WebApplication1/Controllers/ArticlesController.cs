@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Text.Json;
@@ -92,11 +93,11 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpDelete("{ArticleId}"), Authorize]
-        public async Task<IActionResult> DeleteArticle([FromRoute(Name = "ArticleId")] int id)
+        public async Task<IActionResult> DeleteArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = _unitOfWork.Users.FindByEmail(userEmail);
-            var articleToDelete = _unitOfWork.Articles.Get(id);
+            var articleToDelete = _unitOfWork.Articles.Get(articleId);
             if(articleToDelete == null)
             {
                 return NotFound("there is no article with such id ");
@@ -109,6 +110,31 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             return Ok("Article succesfully deleted");
         }
+        [HttpPatch("{ArticleId}"), Authorize]
+        public ActionResult ArticlePartialUpdate([FromRoute(Name = "ArticleId")] int articleId 
+            ,  JsonPatchDocument<ArticlePostRequest> patchDocument)
+        {
+            var articleToUpdate = _unitOfWork.Articles.Get(articleId);
+            if (articleToUpdate == null)
+            {
+                return NotFound();
+            }
+            ArticlePostRequest articlePostRequest = new ArticlePostRequest
+            {
+                Title = articleToUpdate.Title,
+                Content = articleToUpdate.Content
+            };
+            patchDocument.ApplyTo(articlePostRequest , ModelState);
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            articleToUpdate.Title = articlePostRequest.Title;
+            articleToUpdate.Content = articlePostRequest.Content;
+            _unitOfWork.complete();
+            return Ok();
+        }
+
         [HttpGet("{ArticleId}/Comments"), Authorize]
         public async Task<ActionResult<Comments>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
