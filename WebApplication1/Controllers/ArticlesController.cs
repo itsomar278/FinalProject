@@ -20,7 +20,7 @@ namespace WebApplication1.Controllers
         {
             _unitOfWork = unitOfWork;
         }
-        [HttpPost("PostArticle") , Authorize]
+        [HttpPost, Authorize]
         public async Task<ActionResult<Articles>> PostArticle(ArticlePostRequest request)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
@@ -41,7 +41,7 @@ namespace WebApplication1.Controllers
                 _unitOfWork.complete();
                 user.PublishedArticles.Add(Article);
                 _unitOfWork.complete();
-                return Ok("article posted");
+                return Ok("Article posted");
             }
         }
         [HttpGet,Authorize]
@@ -72,8 +72,8 @@ namespace WebApplication1.Controllers
                 return Ok(articleResponses);
             }
         }
-        [HttpGet("{id}"),Authorize]
-        public async Task<IActionResult> GetArticle(int id)
+        [HttpGet("{ArticleId}"),Authorize]
+        public async Task<IActionResult> GetArticle([FromRoute(Name = "ArticleId")] int id)
         {
             var article = _unitOfWork.Articles.Get(id);
             if (article == null)
@@ -90,17 +90,16 @@ namespace WebApplication1.Controllers
                 };
                 return Ok(ArticleResponse);
             }
-         
         }
-        [HttpPost("DeleteArticle"), Authorize]
-        public async Task<IActionResult> DeleteArticle(int id)
+        [HttpDelete("{ArticleId}"), Authorize]
+        public async Task<IActionResult> DeleteArticle([FromRoute(Name = "ArticleId")] int id)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = _unitOfWork.Users.FindByEmail(userEmail);
             var articleToDelete = _unitOfWork.Articles.Get(id);
             if(articleToDelete == null)
             {
-                return BadRequest("there is no article with such id ");
+                return NotFound("there is no article with such id ");
             }
             if (user.UserId != articleToDelete.UserId)
             {
@@ -109,6 +108,83 @@ namespace WebApplication1.Controllers
             _unitOfWork.Articles.Remove(articleToDelete);
             _unitOfWork.complete();
             return Ok("Article succesfully deleted");
+        }
+        [HttpGet("{ArticleId}/Comments"), Authorize]
+        public async Task<ActionResult<Comments>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int id)
+        {
+            var article = _unitOfWork.Articles.Get(id);
+            if (article == null)
+            {
+                return NotFound("specified article cannot be found");
+            }
+            else
+            {
+                var comments = _unitOfWork.Comments.Find(c => c.ArticleId == id);
+                if(comments.Count() == 0)
+                {
+                    return Ok("there is no comments on this article ");
+                }
+                List<CommentResponse> response = new List<CommentResponse>();
+                foreach (var comment in comments)
+                {
+                    CommentResponse commentResponse = new CommentResponse
+                    {
+                        UserName = _unitOfWork.Users.Find(u => u.UserId == comment.UserId).First().UserName,
+                        CommentContent = comment.CommentContent
+                    };
+                    response.Add(commentResponse);
+                }
+                return Ok(response);
+            }
+        }
+        [HttpPost("{ArticleId}/Comments"), Authorize]
+        public async Task<ActionResult<Articles>> PostComments(CommentRequest request ,[FromRoute(Name = "ArticleId")] int id  )
+        {
+            var article = _unitOfWork.Articles.Get(id);
+            if (article == null)
+            {
+                return NotFound("specified article cannot be found");
+            }
+            else
+            {
+                var userEmail = User.FindFirstValue(ClaimTypes.Email);
+                if(string.IsNullOrEmpty(userEmail))
+                {
+                    return BadRequest();
+                }
+               var user = _unitOfWork.Users.FindByEmail(userEmail);
+                Comments comment = new Comments
+                {
+                    UserId = user.UserId,
+                    ArticleId = id,
+                    CommentContent= request.CommentContent,
+                };
+                _unitOfWork.Comments.Add(comment);
+                _unitOfWork.complete();
+                return Ok("comment succesfully posted !");
+            }
+        }
+        [HttpDelete("{ArticleId}/Comments/{CommentId}"), Authorize]
+        public async Task<IActionResult> DeleteArticle([FromRoute(Name = "ArticleId")] int articleId , [FromRoute(Name = "CommentId")] int commentId )
+        {
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(userEmail))
+            {
+                return BadRequest();
+            }
+            var user = _unitOfWork.Users.FindByEmail(userEmail);
+            var commentToDelete = _unitOfWork.Comments.Get(commentId);
+            if (commentToDelete == null || commentToDelete.ArticleId != articleId)
+            {
+                return NotFound("cannot find the specified comment on this article");
+            }
+            if(user.UserId != commentToDelete.UserId)
+            { 
+            return Unauthorized("you cant delete other user comments !");
+            }
+            _unitOfWork.Comments.Remove(commentToDelete);
+            _unitOfWork.complete();
+            return Ok("comment deleted succesfully");
         }
 
     }

@@ -29,7 +29,7 @@ namespace WebApplication1.Services.Authentication
             var token = new JwtSecurityToken
                 (
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(5),
+                expires: DateTime.Now.AddMinutes(1),
                 signingCredentials: creds
                 );
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
@@ -54,10 +54,6 @@ namespace WebApplication1.Services.Authentication
             };
 
             return refreshToken;
-        }
-        public void SetRefreshToken(RefreshTokens newRefreshToken)
-        {
-            throw new NotImplementedException();
         }
     }
 }

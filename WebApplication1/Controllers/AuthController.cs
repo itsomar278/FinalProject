@@ -78,7 +78,7 @@ namespace WebApplication1.Controllers
                 return BadRequest("either email is wrong or password");
             }
         }
-		[HttpPost("refresh"),Authorize]
+		[HttpPost("refresh") ,Authorize]
         public async Task<ActionResult<string>> RefreshToken()
 		{
 			var refreshToken = Request.Cookies["refreshToken"];
@@ -105,7 +105,7 @@ namespace WebApplication1.Controllers
 					_unitOfWork.complete();
 					_unitOfWork.Users.UpdateUserRefreshToken(user, newRefreshToken.TokenId);
                     _unitOfWork.complete();
-					return Ok("refreshed");
+					return Ok(token);
                 }
             }
 			else

@@ -52,7 +52,9 @@ namespace WebApplication1
             IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8
                 .GetBytes("myfinalprojectforts123")),
             ValidateIssuer = false,
-            ValidateAudience = false
+            ValidateAudience = false,
+             ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
         };
     });
             builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",

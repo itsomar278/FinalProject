@@ -8,6 +8,5 @@ namespace WebApplication1.Services.Authentication
         bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt);
         string CreateToken(Users user);
         RefreshTokens GenerateRefreshToken(int userId);
-        void SetRefreshToken(RefreshTokens newRefreshToken);
     }
 }
