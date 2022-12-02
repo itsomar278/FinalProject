@@ -157,7 +157,6 @@ namespace WebApplication1.Controllers
                     CommentContent = comment.CommentContent,
                     UserName = _unitOfWork.Users.Get(comment.UserId).UserName
                 };
-                
                 return Ok(response);
             }
         }
@@ -211,6 +210,5 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             return Ok("comment deleted succesfully");
         }
-
     }
 }
