@@ -110,16 +110,16 @@ namespace WebApplication1.Controllers
             return Ok("Article succesfully deleted");
         }
         [HttpGet("{ArticleId}/Comments"), Authorize]
-        public async Task<ActionResult<Comments>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int id)
+        public async Task<ActionResult<Comments>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
-            var article = _unitOfWork.Articles.Get(id);
+            var article = _unitOfWork.Articles.Get(articleId);
             if (article == null)
             {
                 return NotFound("specified article cannot be found");
             }
             else
             {
-                var comments = _unitOfWork.Comments.Find(c => c.ArticleId == id);
+                var comments = _unitOfWork.Comments.Find(c => c.ArticleId == articleId);
                 if(comments.Count() == 0)
                 {
                     return Ok("there is no comments on this article ");
@@ -137,6 +137,31 @@ namespace WebApplication1.Controllers
                 return Ok(response);
             }
         }
+        [HttpGet("{ArticleId}/Comments/{CommentId}"), Authorize]
+        public async Task<IActionResult> getCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)
+        {
+            var article = _unitOfWork.Articles.Get(articleId);
+            if (article == null)
+            {
+                return NotFound("specified article cannot be found");
+            }
+            else
+            {
+                var comment = _unitOfWork.Comments.Find(c => c.ArticleId == articleId && c.CommentId == commentId).FirstOrDefault();
+                if (comment == null)
+                {
+                    return Ok("there is no comments on this article ");
+                }
+                CommentResponse response = new CommentResponse
+                {
+                    CommentContent = comment.CommentContent,
+                    UserName = _unitOfWork.Users.Get(comment.UserId).UserName
+                };
+                
+                return Ok(response);
+            }
+        }
+
         [HttpPost("{ArticleId}/Comments"), Authorize]
         public async Task<ActionResult<Articles>> PostComments(CommentRequest request ,[FromRoute(Name = "ArticleId")] int id  )
         {
@@ -165,7 +190,7 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpDelete("{ArticleId}/Comments/{CommentId}"), Authorize]
-        public async Task<IActionResult> DeleteArticle([FromRoute(Name = "ArticleId")] int articleId , [FromRoute(Name = "CommentId")] int commentId )
+        public async Task<IActionResult> DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId , [FromRoute(Name = "CommentId")] int commentId )
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrEmpty(userEmail))
