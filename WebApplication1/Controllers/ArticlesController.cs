@@ -22,7 +22,7 @@ namespace WebApplication1.Controllers
             _unitOfWork = unitOfWork;
         }
         [HttpPost, Authorize]
-        public async Task<ActionResult<Articles>> PostArticle(ArticlePostRequest request)
+        public ActionResult<Articles> PostArticle(ArticlePostRequest request)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if(string.IsNullOrEmpty(userEmail))
@@ -46,7 +46,7 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpGet,Authorize]
-        public async Task<ActionResult<Articles>> GetArticles(string? title , string? searchQuery , int pageNumber = 1 , int pageSize = 2)
+        public ActionResult<Articles> GetArticles(string? title , string? searchQuery , int pageNumber = 1 , int pageSize = 2)
         {
             if(pageSize > maxArticlesPageSize)
             {
@@ -74,7 +74,7 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpGet("{ArticleId}"),Authorize]
-        public async Task<IActionResult> GetArticle([FromRoute(Name = "ArticleId")] int id)
+        public ActionResult GetArticle([FromRoute(Name = "ArticleId")] int id)
         {
             var article = _unitOfWork.Articles.Get(id);
             if (article == null)
@@ -93,7 +93,7 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpDelete("{ArticleId}"), Authorize]
-        public async Task<IActionResult> DeleteArticle([FromRoute(Name = "ArticleId")] int articleId)
+        public ActionResult DeleteArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = _unitOfWork.Users.FindByEmail(userEmail);
@@ -119,6 +119,12 @@ namespace WebApplication1.Controllers
             {
                 return NotFound();
             }
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            var user = _unitOfWork.Users.FindByEmail(userEmail);
+            if (user.UserId != articleToUpdate.UserId)
+            {
+                return Unauthorized();
+            }
             ArticlePostRequest articlePostRequest = new ArticlePostRequest
             {
                 Title = articleToUpdate.Title,
@@ -132,11 +138,11 @@ namespace WebApplication1.Controllers
             articleToUpdate.Title = articlePostRequest.Title;
             articleToUpdate.Content = articlePostRequest.Content;
             _unitOfWork.complete();
-            return Ok();
+            return Ok("Article successfully updated");
         }
 
         [HttpGet("{ArticleId}/Comments"), Authorize]
-        public async Task<ActionResult<Comments>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
+        public ActionResult<Comments> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
             var article = _unitOfWork.Articles.Get(articleId);
             if (article == null)
@@ -164,7 +170,7 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpGet("{ArticleId}/Comments/{CommentId}"), Authorize]
-        public async Task<IActionResult> getCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)
+        public ActionResult getCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)
         {
             var article = _unitOfWork.Articles.Get(articleId);
             if (article == null)
@@ -176,7 +182,7 @@ namespace WebApplication1.Controllers
                 var comment = _unitOfWork.Comments.Find(c => c.ArticleId == articleId && c.CommentId == commentId).FirstOrDefault();
                 if (comment == null)
                 {
-                    return Ok("there is no comments on this article ");
+                    return Ok("the specified comment cannot be found ");
                 }
                 CommentResponse response = new CommentResponse
                 {
@@ -188,7 +194,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost("{ArticleId}/Comments"), Authorize]
-        public async Task<ActionResult<Articles>> PostComments(CommentRequest request ,[FromRoute(Name = "ArticleId")] int id  )
+        public ActionResult<Articles> PostComments(CommentRequest request ,[FromRoute(Name = "ArticleId")] int id  )
         {
             var article = _unitOfWork.Articles.Get(id);
             if (article == null)
@@ -215,7 +221,7 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpDelete("{ArticleId}/Comments/{CommentId}"), Authorize]
-        public async Task<IActionResult> DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId , [FromRoute(Name = "CommentId")] int commentId )
+        public ActionResult DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId , [FromRoute(Name = "CommentId")] int commentId )
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrEmpty(userEmail))
