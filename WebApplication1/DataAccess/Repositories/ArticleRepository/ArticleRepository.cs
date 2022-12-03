@@ -19,20 +19,21 @@ namespace WebApplication1.DataAccess.Repositories.ArticleRepository
             
             if(string.IsNullOrEmpty(title) && string.IsNullOrEmpty(searchQuery))
             {
-                articles= GetAll().OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                articles= _DbContext.Set<Articles>().OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 return articles;
             }
            if (!string.IsNullOrEmpty(title)&& string.IsNullOrEmpty(searchQuery))
             {
-                articles= Find(a => a.Title.Contains(title)).OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                articles= _DbContext.Set<Articles>().Where(a => a.Title.Contains(title)).OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 return articles;
             }
            if(string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(searchQuery))
             {
-                articles= Find(a => a.Content.Contains(searchQuery));
+                articles= _DbContext.Set<Articles>().Where(a => a.Content.Contains(searchQuery))
+                    .OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize); ;
                 return articles;
             }
-                articles = Find(a => a.Content.Contains(searchQuery) && a.Title.Contains(title))
+                articles = _DbContext.Set<Articles>().Where(a => a.Content.Contains(searchQuery) && a.Title.Contains(title))
                         .OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 return articles;
         }

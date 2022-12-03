@@ -2,7 +2,7 @@
 
 namespace WebApplication1.DataAccess.Repositories.FavoriteRepository
 {
-    public interface IFavouriteRepository :IRepository<Favorite>
-    {
+    public interface IFavouriteRepository : IRepository<Favorite>
+    { 
     }
 }

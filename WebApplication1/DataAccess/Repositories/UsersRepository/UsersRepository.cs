@@ -22,5 +22,18 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
         {
             user.RefreshTokenId = refreshTokenId;
         }
+        public IEnumerable<Users> GetUsers(string? searchQuery, int pageNumber, int pageSize)
+        {
+            if (string.IsNullOrEmpty(searchQuery))
+            {
+                var users = GetAll().OrderBy(u => u.UserName).Skip(pageSize * (pageNumber - 1)).Take(pageSize); 
+                return users;
+            } 
+            else
+            {
+                var users = Find(u=>u.UserName.Contains(searchQuery)).OrderBy(u => u.UserName).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                return users;
+            }
+        }
     }
 }

@@ -5,7 +5,7 @@ namespace WebApplication1.DataAccess.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
-        protected readonly DbContext _DbContext; // of type interface **
+        protected readonly DbContext _DbContext;
         public Repository(DbContext dbContext)
         {
             _DbContext = dbContext;
@@ -22,8 +22,9 @@ namespace WebApplication1.DataAccess.Repositories
         {
             return _DbContext.Set<TEntity>().Where(predicate);
         }
-        public TEntity Get(int id)
+        public virtual TEntity Get(int id)
         {
+            var x = 5;
             return _DbContext.Set<TEntity>().Find(id);
         }
         public IEnumerable<TEntity> GetAll()

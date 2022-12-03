@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
-using System.Text.Json;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
@@ -16,7 +14,7 @@ namespace WebApplication1.Controllers
     public class ArticlesController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
-        const int maxArticlesPageSize = 5; 
+        const int maxArticlesPageSize = 5;
         public ArticlesController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -25,17 +23,17 @@ namespace WebApplication1.Controllers
         public ActionResult<Articles> PostArticle(ArticlePostRequest request)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            if(string.IsNullOrEmpty(userEmail))
+            if (string.IsNullOrEmpty(userEmail))
             {
                 return BadRequest();
             }
             else
             {
-                var user =_unitOfWork.Users.FindByEmail(userEmail);
+                var user = _unitOfWork.Users.FindByEmail(userEmail);
                 Articles Article = new Articles
                 {
-                    Title = request.Title ,
-                    Content= request.Content ,
+                    Title = request.Title,
+                    Content = request.Content,
                     UserId = user.UserId
                 };
                 _unitOfWork.Articles.Add(Article);
@@ -45,15 +43,15 @@ namespace WebApplication1.Controllers
                 return Ok("Article posted");
             }
         }
-        [HttpGet,Authorize]
-        public ActionResult<Articles> GetArticles(string? title , string? searchQuery , int pageNumber = 1 , int pageSize = 2)
+        [HttpGet, Authorize]
+        public ActionResult<Articles> GetArticles(string? title, string? searchQuery, int pageNumber = 1, int pageSize = 2)
         {
-            if(pageSize > maxArticlesPageSize)
+            if (pageSize > maxArticlesPageSize)
             {
                 pageSize = maxArticlesPageSize;
             }
-            var articles = _unitOfWork.Articles.GetArticles( title, searchQuery, pageNumber , pageSize);
-            if(articles.Count() == 0)
+            var articles = _unitOfWork.Articles.GetArticles(title, searchQuery, pageNumber, pageSize);
+            if (articles.Count() == 0)
             {
                 return NotFound();
             }
@@ -65,15 +63,15 @@ namespace WebApplication1.Controllers
                     ArticleResponse ArticleResponse = new ArticleResponse
                     {
                         AuthorUserName = _unitOfWork.Users.Find(u => u.UserId == article.UserId).First().UserName,
-                        Title = article.Title ,
-                        Content = article.Content ,
+                        Title = article.Title,
+                        Content = article.Content,
                     };
                     articleResponses.Add(ArticleResponse);
                 }
                 return Ok(articleResponses);
             }
         }
-        [HttpGet("{ArticleId}"),Authorize]
+        [HttpGet("{ArticleId}"), Authorize]
         public ActionResult GetArticle([FromRoute(Name = "ArticleId")] int id)
         {
             var article = _unitOfWork.Articles.Get(id);
@@ -98,7 +96,7 @@ namespace WebApplication1.Controllers
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             var user = _unitOfWork.Users.FindByEmail(userEmail);
             var articleToDelete = _unitOfWork.Articles.Get(articleId);
-            if(articleToDelete == null)
+            if (articleToDelete == null)
             {
                 return NotFound("there is no article with such id ");
             }
@@ -111,8 +109,8 @@ namespace WebApplication1.Controllers
             return Ok("Article succesfully deleted");
         }
         [HttpPatch("{ArticleId}"), Authorize]
-        public ActionResult ArticlePartialUpdate([FromRoute(Name = "ArticleId")] int articleId 
-            ,  JsonPatchDocument<ArticlePostRequest> patchDocument)
+        public ActionResult ArticlePartialUpdate([FromRoute(Name = "ArticleId")] int articleId
+            , JsonPatchDocument<ArticlePostRequest> patchDocument)
         {
             var articleToUpdate = _unitOfWork.Articles.Get(articleId);
             if (articleToUpdate == null)
@@ -130,8 +128,8 @@ namespace WebApplication1.Controllers
                 Title = articleToUpdate.Title,
                 Content = articleToUpdate.Content
             };
-            patchDocument.ApplyTo(articlePostRequest , ModelState);
-            if(!ModelState.IsValid)
+            patchDocument.ApplyTo(articlePostRequest, ModelState);
+            if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
@@ -152,7 +150,7 @@ namespace WebApplication1.Controllers
             else
             {
                 var comments = _unitOfWork.Comments.Find(c => c.ArticleId == articleId);
-                if(comments.Count() == 0)
+                if (comments.Count() == 0)
                 {
                     return Ok("there is no comments on this article ");
                 }
@@ -194,7 +192,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost("{ArticleId}/Comments"), Authorize]
-        public ActionResult<Articles> PostComments(CommentRequest request ,[FromRoute(Name = "ArticleId")] int id  )
+        public ActionResult<Articles> PostComments(CommentRequest request, [FromRoute(Name = "ArticleId")] int id)
         {
             var article = _unitOfWork.Articles.Get(id);
             if (article == null)
@@ -204,16 +202,16 @@ namespace WebApplication1.Controllers
             else
             {
                 var userEmail = User.FindFirstValue(ClaimTypes.Email);
-                if(string.IsNullOrEmpty(userEmail))
+                if (string.IsNullOrEmpty(userEmail))
                 {
                     return BadRequest();
                 }
-               var user = _unitOfWork.Users.FindByEmail(userEmail);
+                var user = _unitOfWork.Users.FindByEmail(userEmail);
                 Comments comment = new Comments
                 {
                     UserId = user.UserId,
                     ArticleId = id,
-                    CommentContent= request.CommentContent,
+                    CommentContent = request.CommentContent,
                 };
                 _unitOfWork.Comments.Add(comment);
                 _unitOfWork.complete();
@@ -221,7 +219,7 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpDelete("{ArticleId}/Comments/{CommentId}"), Authorize]
-        public ActionResult DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId , [FromRoute(Name = "CommentId")] int commentId )
+        public ActionResult DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrEmpty(userEmail))
@@ -234,9 +232,9 @@ namespace WebApplication1.Controllers
             {
                 return NotFound("cannot find the specified comment on this article");
             }
-            if(user.UserId != commentToDelete.UserId)
-            { 
-            return Unauthorized("you cant delete other user comments !");
+            if (user.UserId != commentToDelete.UserId)
+            {
+                return Unauthorized("you cant delete other user comments !");
             }
             _unitOfWork.Comments.Remove(commentToDelete);
             _unitOfWork.complete();

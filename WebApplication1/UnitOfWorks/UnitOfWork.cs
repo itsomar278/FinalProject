@@ -20,6 +20,7 @@ namespace WebApplication1.UnitOfWorks
             Comments = new CommentsRepository(_projectDbContext);
             Users = new UsersRepository(_projectDbContext);
             RefreshTokens = new RefreshTokensRepository(_projectDbContext);
+            Favorites = new FavouriteRepository(_projectDbContext);
         }
         public   IFollowRepository Follows { get; private set; }
         public IArticleRepository Articles { get; private set; }
