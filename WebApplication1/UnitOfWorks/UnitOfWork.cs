@@ -12,15 +12,17 @@ namespace WebApplication1.UnitOfWorks
     public class UnitOfWork : IUnitOfWork
     {
         private readonly ProjectDbContext _projectDbContext;
-        public UnitOfWork(ProjectDbContext projectDbContext) // injection via c
+        public UnitOfWork(ProjectDbContext projectDbContext , IFollowRepository follows , IArticleRepository articles
+            , ICommentsRepository comments , IUsersRepository users , IRefreshTokenRepository refreshTokens
+            , IFavouriteRepository favorites) 
         {
             _projectDbContext = projectDbContext;
-            Follows = new FollowRepository(_projectDbContext);
-            Articles = new ArticleRepository(_projectDbContext);
-            Comments = new CommentsRepository(_projectDbContext);
-            Users = new UsersRepository(_projectDbContext);
-            RefreshTokens = new RefreshTokensRepository(_projectDbContext);
-            Favorites = new FavouriteRepository(_projectDbContext);
+            Follows = follows;
+            Articles = articles;
+            Comments = comments;
+            Users = users;
+            RefreshTokens = refreshTokens;
+            Favorites = favorites;
         }
         public   IFollowRepository Follows { get; private set; }
         public IArticleRepository Articles { get; private set; }

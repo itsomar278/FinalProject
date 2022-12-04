@@ -4,8 +4,10 @@ using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
 using WebApplication1.DataAccess;
+using WebApplication1.DataAccess.Repositories;
 using WebApplication1.DataAccess.Repositories.ArticleRepository;
 using WebApplication1.DataAccess.Repositories.CommentRepository;
+using WebApplication1.DataAccess.Repositories.FavoriteRepository;
 using WebApplication1.DataAccess.Repositories.FollowRepository;
 using WebApplication1.DataAccess.Repositories.RefreshTokenRepository;
 using WebApplication1.DataAccess.Repositories.UsersRepository;
@@ -27,7 +29,14 @@ namespace WebApplication1
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddDbContext<ProjectDbContext>();
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
+            builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddTransient<IUsersRepository, UsersRepository>();
+            builder.Services.AddTransient<IFollowRepository, FollowRepository>();
+            builder.Services.AddTransient<IArticleRepository, ArticleRepository>();
+            builder.Services.AddTransient<ICommentsRepository, CommentsRepository>();
+            builder.Services.AddTransient<IFavouriteRepository ,FavouriteRepository>();
+            builder.Services.AddTransient<IRefreshTokenRepository, RefreshTokensRepository>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IAuthinticateService , AuthenticationService>();
             builder.Services.AddControllers().AddJsonOptions(x =>
@@ -63,9 +72,7 @@ namespace WebApplication1
     {
         policy.WithOrigins("https://localhost:7248/").AllowAnyMethod().AllowAnyHeader();
     }));
-
             var app = builder.Build();
-
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {

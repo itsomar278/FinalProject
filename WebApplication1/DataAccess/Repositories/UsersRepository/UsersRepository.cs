@@ -35,5 +35,11 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
                 return users;
             }
         }
+        public bool DoesExist(int userId)
+        {
+            var doesExist = _DbContext.Set<Users>().Any(u => u.UserId == userId);
+            return doesExist;
+        }
+
     }
 }

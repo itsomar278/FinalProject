@@ -5,7 +5,7 @@ namespace WebApplication1.DataAccess.Repositories.RefreshTokenRepository
 {
     public class RefreshTokensRepository : Repository<RefreshTokens>, IRefreshTokenRepository
     {
-        public RefreshTokensRepository(DbContext dbContext) : base(dbContext)
+        public RefreshTokensRepository(ProjectDbContext dbContext) : base(dbContext)
         {
         }
         public ProjectDbContext projectDbContext

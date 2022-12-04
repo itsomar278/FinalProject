@@ -5,7 +5,7 @@ namespace WebApplication1.DataAccess.Repositories.FavoriteRepository
 {
     public class FavouriteRepository : Repository<Favorite>, IFavouriteRepository
     {
-        public FavouriteRepository(DbContext dbContext) : base(dbContext)
+        public FavouriteRepository(ProjectDbContext dbContext) : base(dbContext)
         {
         }
         public ProjectDbContext projectDbContext

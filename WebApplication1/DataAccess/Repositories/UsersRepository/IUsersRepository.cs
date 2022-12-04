@@ -9,5 +9,6 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
         public Users FindByEmail(string email);
         public void UpdateUserRefreshToken(Users user, int refreshTokenId);
         public IEnumerable<Users> GetUsers(string? searchQuery, int pageNumber, int pageSize);
+        public bool DoesExist(int userId);
     }
 }
