@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebApplication1.Models.Entites
 {
@@ -15,6 +16,7 @@ namespace WebApplication1.Models.Entites
         [Required]
         public DateTime Expires { get; set; }
         public int UserId { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
         public Users User { get; set; }
     }
 }

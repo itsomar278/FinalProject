@@ -5,6 +5,7 @@ using System.Security.Claims;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
+using WebApplication1.Services.SessionManagment;
 using WebApplication1.UnitOfWorks;
 
 namespace WebApplication1.Controllers
@@ -14,10 +15,12 @@ namespace WebApplication1.Controllers
     public class ArticlesController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ISessionDataManagment _sessionDataManagment;
         const int maxArticlesPageSize = 5;
-        public ArticlesController(IUnitOfWork unitOfWork)
+        public ArticlesController(IUnitOfWork unitOfWork, ISessionDataManagment sessionDataManagment)
         {
             _unitOfWork = unitOfWork;
+            _sessionDataManagment = sessionDataManagment;
         }
         [HttpPost, Authorize]
         public ActionResult<Articles> PostArticle(ArticlePostRequest request)
@@ -72,34 +75,30 @@ namespace WebApplication1.Controllers
             }
         }
         [HttpGet("{ArticleId}"), Authorize]
-        public ActionResult GetArticle([FromRoute(Name = "ArticleId")] int id)
+        public ActionResult GetArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
-            var article = _unitOfWork.Articles.Get(id);
-            if (article == null)
+            if (_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
             {
-                return NotFound();
+                return NotFound("cannot find the specified article");
             }
-            else
+            var article = _unitOfWork.Articles.Get(articleId);
+            ArticleResponse ArticleResponse = new ArticleResponse
             {
-                ArticleResponse ArticleResponse = new ArticleResponse
-                {
-                    AuthorUserName = _unitOfWork.Users.Find(u => u.UserId == article.UserId).First().UserName,
-                    Title = article.Title,
-                    Content = article.Content,
-                };
-                return Ok(ArticleResponse);
-            }
+                AuthorUserName = _unitOfWork.Users.Find(u => u.UserId == article.UserId).First().UserName,
+                Title = article.Title,
+                Content = article.Content,
+            };
+            return Ok(ArticleResponse);
         }
         [HttpDelete("{ArticleId}"), Authorize]
         public ActionResult DeleteArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var user = _unitOfWork.Users.FindByEmail(userEmail);
-            var articleToDelete = _unitOfWork.Articles.Get(articleId);
-            if (articleToDelete == null)
+            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
             {
                 return NotFound("there is no article with such id ");
             }
+            var user = _sessionDataManagment.GetUserFromSession();
+            var articleToDelete = _unitOfWork.Articles.Get(articleId);
             if (user.UserId != articleToDelete.UserId)
             {
                 return Unauthorized();
@@ -112,13 +111,12 @@ namespace WebApplication1.Controllers
         public ActionResult ArticlePartialUpdate([FromRoute(Name = "ArticleId")] int articleId
             , JsonPatchDocument<ArticlePostRequest> patchDocument)
         {
-            var articleToUpdate = _unitOfWork.Articles.Get(articleId);
-            if (articleToUpdate == null)
+            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
             {
                 return NotFound();
             }
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var user = _unitOfWork.Users.FindByEmail(userEmail);
+            var articleToUpdate = _unitOfWork.Articles.Get(articleId);
+            var user = _sessionDataManagment.GetUserFromSession();
             if (user.UserId != articleToUpdate.UserId)
             {
                 return Unauthorized();
@@ -131,7 +129,7 @@ namespace WebApplication1.Controllers
             patchDocument.ApplyTo(articlePostRequest, ModelState);
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest();
             }
             articleToUpdate.Title = articlePostRequest.Title;
             articleToUpdate.Content = articlePostRequest.Content;
@@ -142,8 +140,7 @@ namespace WebApplication1.Controllers
         [HttpGet("{ArticleId}/Comments"), Authorize]
         public ActionResult<Comments> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
-            var article = _unitOfWork.Articles.Get(articleId);
-            if (article == null)
+            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
             {
                 return NotFound("specified article cannot be found");
             }
@@ -169,54 +166,45 @@ namespace WebApplication1.Controllers
         }
         [HttpGet("{ArticleId}/Comments/{CommentId}"), Authorize]
         public ActionResult getCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)
-        {
-            var article = _unitOfWork.Articles.Get(articleId);
-            if (article == null)
+        { 
+            if (!_unitOfWork.Articles.DoesExist(A => A.ArticleId == articleId))
             {
                 return NotFound("specified article cannot be found");
             }
-            else
+            if (!_unitOfWork.Comments.DoesExist(C => C.CommentId == commentId))
             {
-                var comment = _unitOfWork.Comments.Find(c => c.ArticleId == articleId && c.CommentId == commentId).FirstOrDefault();
-                if (comment == null)
-                {
-                    return Ok("the specified comment cannot be found ");
-                }
-                CommentResponse response = new CommentResponse
-                {
-                    CommentContent = comment.CommentContent,
-                    UserName = _unitOfWork.Users.Get(comment.UserId).UserName
-                };
-                return Ok(response);
+                return Ok("the specified comment cannot be found ");
             }
+            var comment = _unitOfWork.Comments.Get(commentId);
+            CommentResponse response = new CommentResponse
+            {
+                CommentContent = comment.CommentContent,
+                UserName = _unitOfWork.Users.Get(comment.UserId).UserName
+            };
+            return Ok(response);
         }
-
         [HttpPost("{ArticleId}/Comments"), Authorize]
-        public ActionResult<Articles> PostComments(CommentRequest request, [FromRoute(Name = "ArticleId")] int id)
+        public ActionResult<Articles> PostComments(CommentRequest request, [FromRoute(Name = "ArticleId")] int articleId)
         {
-            var article = _unitOfWork.Articles.Get(id);
-            if (article == null)
+            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
             {
                 return NotFound("specified article cannot be found");
             }
-            else
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(userEmail))
             {
-                var userEmail = User.FindFirstValue(ClaimTypes.Email);
-                if (string.IsNullOrEmpty(userEmail))
-                {
-                    return BadRequest();
-                }
-                var user = _unitOfWork.Users.FindByEmail(userEmail);
-                Comments comment = new Comments
-                {
-                    UserId = user.UserId,
-                    ArticleId = id,
-                    CommentContent = request.CommentContent,
-                };
-                _unitOfWork.Comments.Add(comment);
-                _unitOfWork.complete();
-                return Ok("comment succesfully posted !");
+                return BadRequest();
             }
+            var user = _unitOfWork.Users.FindByEmail(userEmail);
+            Comments comment = new Comments
+            {
+                UserId = user.UserId,
+                ArticleId = articleId,
+                CommentContent = request.CommentContent,
+            };
+            _unitOfWork.Comments.Add(comment);
+            _unitOfWork.complete();
+            return Ok("comment succesfully posted !");
         }
         [HttpDelete("{ArticleId}/Comments/{CommentId}"), Authorize]
         public ActionResult DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)

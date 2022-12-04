@@ -12,6 +12,8 @@ using WebApplication1.DataAccess.Repositories.FollowRepository;
 using WebApplication1.DataAccess.Repositories.RefreshTokenRepository;
 using WebApplication1.DataAccess.Repositories.UsersRepository;
 using WebApplication1.Services.Authentication;
+using WebApplication1.Services.SessionDataManagment;
+using WebApplication1.Services.SessionManagment;
 using WebApplication1.UnitOfWorks;
 
 namespace WebApplication1
@@ -37,8 +39,16 @@ namespace WebApplication1
             builder.Services.AddTransient<ICommentsRepository, CommentsRepository>();
             builder.Services.AddTransient<IFavouriteRepository ,FavouriteRepository>();
             builder.Services.AddTransient<IRefreshTokenRepository, RefreshTokensRepository>();
+            builder.Services.AddTransient<ISessionDataManagment , SessionDataManagment>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IAuthinticateService , AuthenticationService>();
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(1);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            builder.Services.AddDistributedMemoryCache();
             builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             builder.Services.AddSwaggerGen(options =>
@@ -54,7 +64,7 @@ namespace WebApplication1
                 options.OperationFilter<SecurityRequirementsOperationFilter>();
             });
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
+    .       AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -79,7 +89,8 @@ namespace WebApplication1
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
-
+            app.UseSession();
+            app.UseCookiePolicy();
             app.UseHttpsRedirection();
 
             app.UseAuthentication();

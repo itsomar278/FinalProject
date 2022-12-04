@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebApplication1.Models.Entites;
+using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
 using WebApplication1.Services.Authentication;
+using WebApplication1.Services.SessionManagment;
 using WebApplication1.UnitOfWorks;
 
 namespace WebApplication1.Controllers
@@ -15,11 +16,13 @@ namespace WebApplication1.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthinticateService _authinticateService;
+        private readonly ISessionDataManagment _sessionDataManagment;
         const int maxUsersPageSize = 7;
-        public UsersController(IUnitOfWork unitOfWork, IAuthinticateService authinticateService)
+        public UsersController(IUnitOfWork unitOfWork, IAuthinticateService authinticateService , ISessionDataManagment sessionDataManagment)
         {
             _unitOfWork = unitOfWork;
             _authinticateService = authinticateService;
+            _sessionDataManagment = sessionDataManagment;
         }
         [HttpGet, Authorize]
         public ActionResult<Articles> GetUsers(string? searchQuery, int pageNumber = 1, int pageSize = 3)
@@ -52,26 +55,22 @@ namespace WebApplication1.Controllers
         [HttpGet("{UserId}"), Authorize]
         public ActionResult GetUser([FromRoute(Name = "UserId")] int userId)
         {
-            var user = _unitOfWork.Users.Get(userId);
-            if (user == null)
+            if (!_unitOfWork.Users.DoesExist(u=>u.UserId==userId))
             {
                 return NotFound("cannot find the specified user");
             }
-            else
+            var user = _unitOfWork.Users.Get(userId);
+            UsersResponse userRespones = new UsersResponse
             {
-                UsersResponse userRespones = new UsersResponse
-                {
-                    UserEmail = user.UserEmail,
-                    UserName = user.UserName,
-                };
-                return Ok(userRespones);
-            }
+                UserEmail = user.UserEmail,
+                UserName = user.UserName,
+            };
+            return Ok(userRespones);
         }
         [HttpGet("{UserId}/followers"), Authorize]
         public ActionResult GetFollowers([FromRoute(Name = "UserId")] int userId)
         {
-            var user = _unitOfWork.Users.Get(userId);
-            if (user == null)
+            if (!_unitOfWork.Users.DoesExist(u => u.UserId ==userId))
             {
                 return NotFound("cannot find the specified user");
             }
@@ -96,8 +95,7 @@ namespace WebApplication1.Controllers
         [HttpGet("{UserId}/following"), Authorize]
         public ActionResult GetFollowing([FromRoute(Name = "UserId")] int userId)
         {
-            var user = _unitOfWork.Users.Get(userId);
-            if (user == null)
+            if (!_unitOfWork.Users.DoesExist(u => u.UserId ==userId))
             {
                 return NotFound("cannot find the specified user");
             }
@@ -119,39 +117,39 @@ namespace WebApplication1.Controllers
             }
             return Ok(usersResponses);
         }
-        [HttpPost("{UserId}/following/{UserToFollowId}"), Authorize]
-        public ActionResult follow([FromRoute(Name = "UserId")] int userId, [FromRoute(Name = "UserToFollowId")] int UserToFollowId)
+        [HttpPost("{UserId}/following/"), Authorize]
+        public ActionResult Follow([FromRoute(Name = "UserId")] int userId, FollowRequest followRequest)
         {
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var user = _unitOfWork.Users.Find(u => u.UserEmail == userEmail).FirstOrDefault();
-            if (user == null)
+            if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
             {
                 return NotFound();
             }
-            if (user.UserId != userId)
+            var user = _sessionDataManagment.GetUserFromSession();
+            if(userId != user.UserId)
             {
                 return Unauthorized();
             }
-            var userToFollow = _unitOfWork.Users.Get(UserToFollowId);
-            if(userToFollow == null)
+            if(!_unitOfWork.Users.DoesExist(u => u.UserId == followRequest.UserToFollowId))
             {
-                return NotFound("the specified user doesn't exist");
+                return NotFound("cant find a user to follow with such id");
             }
-            var followCheck = _unitOfWork.Follows.Get(userId, UserToFollowId);
-            if (followCheck != null)
+            if(_unitOfWork.Follows.DoesExist(f=>f.FollowerId== userId && f.FollowedId == followRequest.UserToFollowId))
             {
-                return BadRequest("you already follow that user");
+                return Conflict("you already follow this user");
             }
-            _unitOfWork.Follows.FollowUser(userId, UserToFollowId);
+            Follow follow = new Follow
+            {
+                FollowedId = followRequest.UserToFollowId,
+                FollowerId = userId
+            };
+            _unitOfWork.Follows.Add(follow);
             _unitOfWork.complete();
             return Ok("user followed succesfully");
-            
         }
         [HttpDelete("{UserId}/followers/{UserToUnfollowId}"), Authorize]
-        public ActionResult Unfollow([FromRoute(Name = "UserId")] int userId , [FromRoute(Name = "UserToUnfollowId")]int UserToUnfollowId)
+        public ActionResult Unfollow([FromRoute(Name = "UserId")] int userId, [FromRoute(Name = "UserToUnfollowId")] int UserToUnfollowId)
         {
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var user = _unitOfWork.Users.Find(u => u.UserEmail == userEmail).FirstOrDefault();
+            var user = _sessionDataManagment.GetUserFromSession();
             if (user == null)
             {
                 return NotFound();
@@ -160,11 +158,11 @@ namespace WebApplication1.Controllers
             {
                 return Unauthorized();
             }
-            var follow = _unitOfWork.Follows.Get(userId, UserToUnfollowId);
-            if (follow == null)
+            if (!_unitOfWork.Follows.DoesExist(f=>f.FollowerId == userId && f.FollowedId== UserToUnfollowId))
             {
-                return BadRequest("you already not following that user");
+                return NotFound("you already not following that user");
             }
+            var follow = _unitOfWork.Follows.Get((userId, UserToUnfollowId));
             _unitOfWork.Follows.Remove(follow);
             _unitOfWork.complete();
             return Ok("user unfollowed succesfully");
@@ -172,40 +170,39 @@ namespace WebApplication1.Controllers
         [HttpDelete("{UserId}/following/{UserToRemove}"), Authorize]
         public ActionResult RemoveFollower([FromRoute(Name = "UserId")] int userId, [FromRoute(Name = "UserToRemove")] int UserToRemove)
         {
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            var user = _unitOfWork.Users.Find(u => u.UserEmail == userEmail).FirstOrDefault();
-            if(user == null)
+            var user = _sessionDataManagment.GetUserFromSession();
+            if (user == null)
             {
                 return NotFound();
             }
-            if( user.UserId != userId)
+            if (user.UserId != userId)
             {
                 return Unauthorized();
             }
-            var follow = _unitOfWork.Follows.Get(UserToRemove, userId);
-            if (follow == null)
+            if (_unitOfWork.Follows.DoesExist(f => f.FollowedId == userId && f.FollowerId == UserToRemove))
             {
-                return BadRequest("this user already doesn't follow you ");
+                return NotFound("this user already doesn't follow you ");
             }
-            _unitOfWork.Follows.Remove(follow); 
+            var follow =_unitOfWork.Follows.Get((UserToRemove, userId));
+            _unitOfWork.Follows.Remove(follow);
             _unitOfWork.complete();
             return Ok("user removed from followers successfully");
         }
-       [HttpGet("{UserId}/favorite-Articles"), Authorize]
-        public ActionResult GetFavoriteArticles([FromRoute(Name = "UserId")] int userId , int pageNumber = 1, int pageSize = 2)
+        [HttpGet("{UserId}/favorite-Articles"), Authorize]
+        public ActionResult GetFavoriteArticles([FromRoute(Name = "UserId")] int userId, int pageNumber = 1, int pageSize = 2)
         {
             var user = _unitOfWork.Users.Get(userId);
             if (user == null)
             {
-                return NotFound("cannot find the specified user");
+                return NotFound();
             }
-            var favoriteArticles = _unitOfWork.Favorites.Find(f=>f.UserId == userId);
+            var favoriteArticles = _unitOfWork.Favorites.Find(f => f.UserId == userId);
             if (favoriteArticles.Count() == 0)
             {
                 return Ok("user has no favorite articles");
             }
-            List<ArticleResponse> articleResponses= new List<ArticleResponse>();
-            foreach(var favorite in favoriteArticles.Skip(pageSize * (pageNumber - 1)).Take(pageSize))
+            List<ArticleResponse> articleResponses = new List<ArticleResponse>();
+            foreach (var favorite in favoriteArticles.Skip(pageSize * (pageNumber - 1)).Take(pageSize))
             {
                 var article = _unitOfWork.Articles.Get(favorite.ArticleId);
                 var author = _unitOfWork.Users.Get(article.UserId);
@@ -219,5 +216,33 @@ namespace WebApplication1.Controllers
             }
             return Ok(articleResponses);
         }
+        [HttpPost("{UserId}/favorite-Articles/{ArticleId}"), Authorize]
+        public ActionResult AddToFavoriteArticles([FromRoute(Name = "UserId")] int userId, [FromRoute(Name = "ArticleId")] int articleId)
+        {
+            var user = _sessionDataManagment.GetUserFromSession();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            if (user.UserId != userId)
+            {
+                return Unauthorized();
+            }
+            if(!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            {
+                return NotFound("cannot find an article with such id");
+            }
+            if(_unitOfWork.Favorites.DoesExist(f => f.UserId == userId && f.ArticleId == articleId))
+            {
+                return Conflict("you already have this article in your favorites");
+            }
+            _unitOfWork.Favorites.Add(new Favorite
+            { ArticleId = articleId,
+              UserId = userId,
+            });
+            _unitOfWork.complete();
+            return Ok("Article successfully added to favorites");
+        }
+
     }
 }

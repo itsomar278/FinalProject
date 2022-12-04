@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace WebApplication1.Models.Entites
 {
@@ -28,6 +29,7 @@ namespace WebApplication1.Models.Entites
         [Required]
         public byte[] PasswordSalt { get; set; }
         public int? RefreshTokenId { get; set; }
+        [Newtonsoft.Json.JsonIgnore]
         public RefreshTokens? RefreshToken { get; set; }
         public List<Articles> PublishedArticles { get; set; }
         public List<Favorite> FavoriteArticles { get; set; }

@@ -21,12 +21,6 @@ namespace WebApplication1.DataAccess.Repositories.FollowRepository
             };
             Add(follow);
         }
-        public Follow Get(int followerId, int followedId)
-        {
-           var follow = _DbContext.Set<Follow>().Where(f => f.FollowerId== followerId && f.FollowedId == followedId).FirstOrDefault();
-            return follow;
-        }
-
         public List<int> GetAllFollowersId(int userId)
         {
             List<int> followersId = new List<int>();
@@ -46,11 +40,6 @@ namespace WebApplication1.DataAccess.Repositories.FollowRepository
                 followingId.Add(f.FollowedId);
             }
             return followingId;
-        }
-        override
-            public Follow Get(int id)
-        {
-            throw new ArgumentException("unsupported opearation");
         }
     }
 }

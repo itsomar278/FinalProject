@@ -8,6 +8,5 @@ namespace WebApplication1.DataAccess.Repositories.FollowRepository
         public List<int> GetAllFollowersId(int userId);
         public List<int> GetAllFollowingId(int userId);
         public void FollowUser(int userId , int userToFollowId);
-        public Follow Get(int followerId , int followedId);
     }
 }

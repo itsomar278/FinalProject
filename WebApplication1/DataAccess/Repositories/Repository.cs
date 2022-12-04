@@ -22,11 +22,15 @@ namespace WebApplication1.DataAccess.Repositories
         {
             return _DbContext.Set<TEntity>().Where(predicate);
         }
+        public virtual TEntity Get((int, int) id )
+        {
+            return _DbContext.Set<TEntity>().Find(id.Item1 , id.Item2);
+        }
         public virtual TEntity Get(int id)
         {
-            var x = 5;
             return _DbContext.Set<TEntity>().Find(id);
         }
+
         public IEnumerable<TEntity> GetAll()
         {
             return _DbContext.Set<TEntity>().ToList();
@@ -38,6 +42,10 @@ namespace WebApplication1.DataAccess.Repositories
         public void RemoveRange(IEnumerable<TEntity> entities)
         {
             _DbContext.Set<TEntity>().RemoveRange(entities);
+        }
+        public bool DoesExist(Expression<Func<TEntity, bool>> predicate)
+        {
+            return _DbContext.Set<TEntity>().Any(predicate);
         }
     }
 }
