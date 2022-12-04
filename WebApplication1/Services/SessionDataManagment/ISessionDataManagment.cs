@@ -1,4 +1,5 @@
-﻿using WebApplication1.Models.Entites;
+﻿using Microsoft.AspNetCore.Http.Features;
+using WebApplication1.Models.Entites;
 
 namespace WebApplication1.Services.SessionManagment
 {

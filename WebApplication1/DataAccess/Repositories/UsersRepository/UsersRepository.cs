@@ -20,7 +20,14 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
         }
         public void UpdateUserRefreshToken(Users user ,int refreshTokenId)
         {
-            user.RefreshTokenId = refreshTokenId;
+            if (refreshTokenId == 0)
+            {
+                user.RefreshTokenId = null;
+            }
+            else
+            {
+                user.RefreshTokenId = refreshTokenId;
+            }
         }
         public IEnumerable<Users> GetUsers(string? searchQuery, int pageNumber, int pageSize)
         {

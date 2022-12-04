@@ -17,16 +17,13 @@ namespace WebApplication1.Services.SessionDataManagment
             string userJson = _httpContextAccessor.HttpContext.Session.GetString("MyUser");
             if (userJson != null)
             {
-                
                 return JsonConvert.DeserializeObject<Users>(userJson);
             }
             else
             {
-                
                 return null;
             }
         }
-
         public void StoreUserInSession(Users user)
         {
             string userJson = JsonConvert.SerializeObject(user);

@@ -85,18 +85,40 @@ namespace WebApplication1.Controllers
             var refreshToken = Request.Cookies["refreshToken"];
             if (string.IsNullOrEmpty(refreshToken))
             {
+                foreach (var cookie in Request.Cookies.Keys)
+                {
+                    if (cookie == ".AspNetCore.Session")
+                    {
+                        Response.Cookies.Delete(cookie);
+                    }
+                }
                 return Unauthorized("you need to re-login");
             }
             var user = _sessionDataManagment.GetUserFromSession();
             if (user == null)
             {
+                foreach (var cookie in Request.Cookies.Keys)
+                {
+                    if (cookie == ".AspNetCore.Session")
+                    {
+                        Response.Cookies.Delete(cookie);
+                    }
+                }
                 return Unauthorized("you need to re-login");
             }
             var myRefreshToken = _unitOfWork.RefreshTokens.Get((user.RefreshTokenId.Value));
             if (myRefreshToken.Token != refreshToken || myRefreshToken.Expires < DateTime.Now)
             {
+                foreach (var cookie in Request.Cookies.Keys)
+                {
+                    if (cookie == ".AspNetCore.Session")
+                    {
+                        Response.Cookies.Delete(cookie);
+                    }
+                }
                 return Unauthorized("you need to re-login");
             }
+            _unitOfWork.RefreshTokens.Remove(myRefreshToken);
             string token = _authinticateService.CreateToken(user);
             var newRefreshToken = _authinticateService.GenerateRefreshToken(user.UserId);
             var cookieOptions = new CookieOptions
@@ -109,6 +131,7 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             _unitOfWork.Users.UpdateUserRefreshToken(user, newRefreshToken.TokenId);
             _unitOfWork.complete();
+            _sessionDataManagment.StoreUserInSession(user);
             return Ok(token);
         }
         [HttpPost("logout"), Authorize]
@@ -130,6 +153,8 @@ namespace WebApplication1.Controllers
                 if (cookie == ".AspNetCore.Session" || cookie == "refreshToken")
                     Response.Cookies.Delete(cookie);
             }
+            _unitOfWork.Users.UpdateUserRefreshToken(userToLogout, 0);
+            _unitOfWork.complete();
             return Ok("user loged out succesfully");
         }
     }
