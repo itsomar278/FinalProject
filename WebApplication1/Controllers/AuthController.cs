@@ -73,7 +73,7 @@ namespace WebApplication1.Controllers
             Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
             _unitOfWork.RefreshTokens.Add(refreshToken);
             _unitOfWork.complete();
-            _unitOfWork.Users.UpdateUserRefreshToken(userResult, refreshToken.TokenId);
+            _unitOfWork.Users.UpdateUserRefreshToken(userResult.UserId, refreshToken.TokenId);
             _unitOfWork.complete();
             _sessionDataManagment.StoreUserInSession(userResult);
             return Ok(token);
@@ -129,7 +129,7 @@ namespace WebApplication1.Controllers
             Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
             _unitOfWork.RefreshTokens.Add(newRefreshToken); ;
             _unitOfWork.complete();
-            _unitOfWork.Users.UpdateUserRefreshToken(user, newRefreshToken.TokenId);
+            _unitOfWork.Users.UpdateUserRefreshToken(user.UserId, newRefreshToken.TokenId);
             _unitOfWork.complete();
             _sessionDataManagment.StoreUserInSession(user);
             return Ok(token);
@@ -153,7 +153,8 @@ namespace WebApplication1.Controllers
                 if (cookie == ".AspNetCore.Session" || cookie == "refreshToken")
                     Response.Cookies.Delete(cookie);
             }
-            _unitOfWork.Users.UpdateUserRefreshToken(userToLogout, 0);
+
+            _unitOfWork.Users.UpdateUserRefreshToken(userToLogout.UserId, 0);
             _unitOfWork.complete();
             return Ok("user loged out succesfully");
         }

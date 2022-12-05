@@ -7,7 +7,7 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
     public interface IUsersRepository : IRepository<Users>
     {
         public Users FindByEmail(string email);
-        public void UpdateUserRefreshToken(Users user, int refreshTokenId);
+        public void UpdateUserRefreshToken(int userId, int refreshTokenId);
         public IEnumerable<Users> GetUsers(string? searchQuery, int pageNumber, int pageSize);
     }
 }
