@@ -216,8 +216,8 @@ namespace WebApplication1.Controllers
             }
             return Ok(articleResponses);
         }
-        [HttpPost("{UserId}/favorite-Articles/{ArticleId}"), Authorize]
-        public ActionResult AddToFavoriteArticles([FromRoute(Name = "UserId")] int userId, [FromRoute(Name = "ArticleId")] int articleId)
+        [HttpPost("{UserId}/favorite-Articles"), Authorize]
+        public ActionResult AddToFavoriteArticles([FromRoute(Name = "UserId")] int userId, AddToFavouritesRequest request)
         {
             var user = _sessionDataManagment.GetUserFromSession();
             if (user == null)
@@ -228,16 +228,16 @@ namespace WebApplication1.Controllers
             {
                 return Unauthorized();
             }
-            if(!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            if(!_unitOfWork.Articles.DoesExist(a => a.ArticleId == request.ArticleId))
             {
                 return NotFound("cannot find an article with such id");
             }
-            if(_unitOfWork.Favorites.DoesExist(f => f.UserId == userId && f.ArticleId == articleId))
+            if(_unitOfWork.Favorites.DoesExist(f => f.UserId == userId && f.ArticleId == request.ArticleId))
             {
                 return Conflict("you already have this article in your favorites");
             }
             _unitOfWork.Favorites.Add(new Favorite
-            { ArticleId = articleId,
+            { ArticleId = request.ArticleId,
               UserId = userId,
             });
             _unitOfWork.complete();
