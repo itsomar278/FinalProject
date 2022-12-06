@@ -5,6 +5,9 @@ namespace WebApplication1.DataAccess
 {
     public class ProjectDbContext : DbContext
     {
+        public ProjectDbContext(DbContextOptions<ProjectDbContext> options) : base(options)
+        {
+        }
         public DbSet<Users> Users { get; set; }
         public DbSet<Comments> Comments { get; set; }
         public DbSet<Articles> Articles { get; set; }
@@ -55,10 +58,6 @@ namespace WebApplication1.DataAccess
                         .HasOne(u => u.RefreshToken)
                         .WithOne(t => t.User)
                         .HasForeignKey<RefreshTokens>(t=>t.UserId);
-        }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(@"Data Source=DESKTOP-D57N26P;Initial Catalog=FinalProject;Integrated Security=True;MultipleActiveResultSets=true");
         }
     }
 }

@@ -116,7 +116,7 @@ namespace WebApplication1.Controllers
             }
             return Ok(usersResponses);
         }
-        [HttpPost("{UserId}/following/"), Authorize]
+        [HttpPost("{UserId}/following"), Authorize]
         public ActionResult Follow([FromRoute(Name = "UserId")] int userId, FollowRequest followRequest)
         {
             if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
@@ -235,15 +235,17 @@ namespace WebApplication1.Controllers
             {
                 return Conflict("you already have this article in your favorites");
             }
-            _unitOfWork.Favorites.Add(new Favorite
-            { ArticleId = request.ArticleId,
+            Favorite favorite = new Favorite
+            {
+                ArticleId = request.ArticleId,
                 UserId = userId,
-            });
+            };
+            _unitOfWork.Favorites.Add(favorite);
             _unitOfWork.complete();
             return Ok("Article successfully added to favorites");
         }
-        [HttpDelete("{UserId}/favorite-Articles}"), Authorize]
-        public ActionResult RemoveFromFavourites([FromRoute] int userId , RemoveFromFavouritesRequest request)
+        [HttpDelete("{UserId}/favorite-Articles"), Authorize]
+        public ActionResult RemoveFromFavourites([FromRoute(Name ="UserId")] int userId , RemoveFromFavouritesRequest request)
         {
             var user = _sessionDataManagment.GetUserFromSession();
             if (user == null)
@@ -262,14 +264,10 @@ namespace WebApplication1.Controllers
             {
                 return NotFound("there is no article with such id in your favorites");
             }
-            Favorite favorite = new Favorite
-            {
-                UserId = userId,
-                ArticleId = request.ArticleId,
-            };
-            _unitOfWork.Favorites.Add(favorite);
+            var favorite = _unitOfWork.Favorites.Get((request.ArticleId, userId));
+            _unitOfWork.Favorites.Remove(favorite);
             _unitOfWork.complete();
-            return Ok("Article successfully added to yur favorites");
+            return Ok("Article successfully removed from yur favorites");
         }
 
     }

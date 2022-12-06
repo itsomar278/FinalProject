@@ -206,7 +206,7 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             return Ok("comment succesfully posted !");
         }
-        [HttpDelete("{ArticleId}/Comments/{CommentId}"), Authorize]
+        [HttpDelete("{ArticleId}/Comments/{CommentId}"), Authorize]//comment delete request should be added . 
         public ActionResult DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)
         {
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
