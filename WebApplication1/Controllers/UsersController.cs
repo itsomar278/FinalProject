@@ -18,7 +18,7 @@ namespace WebApplication1.Controllers
         private readonly IAuthinticateService _authinticateService;
         private readonly ISessionDataManagment _sessionDataManagment;
         const int maxUsersPageSize = 7;
-        public UsersController(IUnitOfWork unitOfWork, IAuthinticateService authinticateService , ISessionDataManagment sessionDataManagment)
+        public UsersController(IUnitOfWork unitOfWork, IAuthinticateService authinticateService, ISessionDataManagment sessionDataManagment)
         {
             _unitOfWork = unitOfWork;
             _authinticateService = authinticateService;
@@ -51,11 +51,10 @@ namespace WebApplication1.Controllers
                 return Ok(usersResponses);
             }
         }
-
         [HttpGet("{UserId}"), Authorize]
         public ActionResult GetUser([FromRoute(Name = "UserId")] int userId)
         {
-            if (!_unitOfWork.Users.DoesExist(u=>u.UserId==userId))
+            if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
             {
                 return NotFound("cannot find the specified user");
             }
@@ -70,7 +69,7 @@ namespace WebApplication1.Controllers
         [HttpGet("{UserId}/followers"), Authorize]
         public ActionResult GetFollowers([FromRoute(Name = "UserId")] int userId)
         {
-            if (!_unitOfWork.Users.DoesExist(u => u.UserId ==userId))
+            if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
             {
                 return NotFound("cannot find the specified user");
             }
@@ -95,7 +94,7 @@ namespace WebApplication1.Controllers
         [HttpGet("{UserId}/following"), Authorize]
         public ActionResult GetFollowing([FromRoute(Name = "UserId")] int userId)
         {
-            if (!_unitOfWork.Users.DoesExist(u => u.UserId ==userId))
+            if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
             {
                 return NotFound("cannot find the specified user");
             }
@@ -125,15 +124,15 @@ namespace WebApplication1.Controllers
                 return NotFound();
             }
             var user = _sessionDataManagment.GetUserFromSession();
-            if(userId != user.UserId)
+            if (userId != user.UserId)
             {
                 return Unauthorized();
             }
-            if(!_unitOfWork.Users.DoesExist(u => u.UserId == followRequest.UserToFollowId))
+            if (!_unitOfWork.Users.DoesExist(u => u.UserId == followRequest.UserToFollowId))
             {
                 return NotFound("cant find a user to follow with such id");
             }
-            if(_unitOfWork.Follows.DoesExist(f=>f.FollowerId== userId && f.FollowedId == followRequest.UserToFollowId))
+            if (_unitOfWork.Follows.DoesExist(f => f.FollowerId == userId && f.FollowedId == followRequest.UserToFollowId))
             {
                 return Conflict("you already follow this user");
             }
@@ -158,7 +157,7 @@ namespace WebApplication1.Controllers
             {
                 return Unauthorized();
             }
-            if (!_unitOfWork.Follows.DoesExist(f=>f.FollowerId == userId && f.FollowedId== UserToUnfollowId))
+            if (!_unitOfWork.Follows.DoesExist(f => f.FollowerId == userId && f.FollowedId == UserToUnfollowId))
             {
                 return NotFound("you already not following that user");
             }
@@ -183,7 +182,7 @@ namespace WebApplication1.Controllers
             {
                 return NotFound("this user already doesn't follow you ");
             }
-            var follow =_unitOfWork.Follows.Get((UserToRemove, userId));
+            var follow = _unitOfWork.Follows.Get((UserToRemove, userId));
             _unitOfWork.Follows.Remove(follow);
             _unitOfWork.complete();
             return Ok("user removed from followers successfully");
@@ -228,20 +227,49 @@ namespace WebApplication1.Controllers
             {
                 return Unauthorized();
             }
-            if(!_unitOfWork.Articles.DoesExist(a => a.ArticleId == request.ArticleId))
+            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == request.ArticleId))
             {
                 return NotFound("cannot find an article with such id");
             }
-            if(_unitOfWork.Favorites.DoesExist(f => f.UserId == userId && f.ArticleId == request.ArticleId))
+            if (_unitOfWork.Favorites.DoesExist(f => f.UserId == userId && f.ArticleId == request.ArticleId))
             {
                 return Conflict("you already have this article in your favorites");
             }
             _unitOfWork.Favorites.Add(new Favorite
             { ArticleId = request.ArticleId,
-              UserId = userId,
+                UserId = userId,
             });
             _unitOfWork.complete();
             return Ok("Article successfully added to favorites");
+        }
+        [HttpDelete("{UserId}/favorite-Articles}"), Authorize]
+        public ActionResult RemoveFromFavourites([FromRoute] int userId , RemoveFromFavouritesRequest request)
+        {
+            var user = _sessionDataManagment.GetUserFromSession();
+            if (user == null)
+            {
+                return NotFound();
+            }
+            if (user.UserId != userId)
+            {
+                return Unauthorized();
+            }
+            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == request.ArticleId))
+            {
+                return NotFound("cannot find an article with such id");
+            }
+            if (!_unitOfWork.Favorites.DoesExist(f => f.UserId == userId && f.ArticleId == request.ArticleId))
+            {
+                return NotFound("there is no article with such id in your favorites");
+            }
+            Favorite favorite = new Favorite
+            {
+                UserId = userId,
+                ArticleId = request.ArticleId,
+            };
+            _unitOfWork.Favorites.Add(favorite);
+            _unitOfWork.complete();
+            return Ok("Article successfully added to yur favorites");
         }
 
     }

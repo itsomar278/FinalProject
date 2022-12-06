@@ -153,10 +153,49 @@ namespace WebApplication1.Controllers
                 if (cookie == ".AspNetCore.Session" || cookie == "refreshToken")
                     Response.Cookies.Delete(cookie);
             }
-
             _unitOfWork.Users.UpdateUserRefreshToken(userToLogout.UserId, 0);
             _unitOfWork.complete();
             return Ok("user loged out succesfully");
         }
+        [HttpPost("update-password")]
+        public ActionResult<string> UpdatePassword(UserPasswordUpdateRequest request)
+        {
+            var user = _unitOfWork.Users.FindByEmail(request.UserEmail);
+            if (user == null)
+            {
+                return NotFound("There is no user with such email address");
+            }
+            if (!_authinticateService.VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt))
+            {
+                return BadRequest("Incorrect old password");
+            }
+            _authinticateService.CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            _unitOfWork.complete();
+            return Ok("Password updated successfully");
+        }
+        [HttpPost("update-userName")]
+        public ActionResult<string> UpdateUserName(UpdateUserNameRequest request)
+        {
+            var user = _unitOfWork.Users.FindByEmail(request.UserEmail);
+            if (user == null)
+            {
+                return NotFound("There is no user with such email address");
+            }
+            var sessionUser = _sessionDataManagment.GetUserFromSession();
+            if(user.UserId != sessionUser.UserId)
+            {
+                return Unauthorized();
+            }
+            if (!_authinticateService.VerifyPasswordHash(request.userPassword, user.PasswordHash, user.PasswordSalt))
+            {
+                return BadRequest("Incorrect password");
+            }
+            user.UserName= request.NewUserName;
+            _unitOfWork.complete();
+            return Ok("User Name updated successfully");
+        }
+
     }
 }
