@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Services.Authentication;
@@ -71,7 +72,8 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             _unitOfWork.Users.UpdateUserRefreshToken(userResult.UserId, refreshToken.TokenId);
             _unitOfWork.complete();
-            _sessionDataManagment.StoreUserInSession(userResult);
+            var userInSession = _mapper.Map<UserSessionModel>(userResult);
+            _sessionDataManagment.StoreUserInSession(userInSession);
             return Ok(token);
         }
 
@@ -127,7 +129,8 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             _unitOfWork.Users.UpdateUserRefreshToken(user.UserId, newRefreshToken.TokenId);
             _unitOfWork.complete();
-            _sessionDataManagment.StoreUserInSession(user);
+            var userInSession = _mapper.Map<UserSessionModel>(user);
+            _sessionDataManagment.StoreUserInSession(userInSession);
             return Ok(token);
         }
         [HttpPost("logout"), Authorize]

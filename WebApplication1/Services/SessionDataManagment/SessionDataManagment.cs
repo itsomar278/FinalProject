@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Services.SessionManagment;
 
@@ -24,7 +25,7 @@ namespace WebApplication1.Services.SessionDataManagment
                 return null;
             }
         }
-        public void StoreUserInSession(Users user)
+        public void StoreUserInSession(UserSessionModel user)
         {
             string userJson = JsonConvert.SerializeObject(user);
             _httpContextAccessor.HttpContext.Session.SetString("MyUser", userJson);
