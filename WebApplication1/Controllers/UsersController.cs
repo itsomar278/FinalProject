@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using WebApplication1.Models.Entites;
@@ -17,12 +18,15 @@ namespace WebApplication1.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly IAuthinticateService _authinticateService;
         private readonly ISessionDataManagment _sessionDataManagment;
+        private readonly IMapper _mapper;
         const int maxUsersPageSize = 7;
-        public UsersController(IUnitOfWork unitOfWork, IAuthinticateService authinticateService, ISessionDataManagment sessionDataManagment)
+        public UsersController(IUnitOfWork unitOfWork, IAuthinticateService authinticateService, ISessionDataManagment sessionDataManagment
+           , IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _authinticateService = authinticateService;
             _sessionDataManagment = sessionDataManagment;
+            _mapper = mapper;
         }
         [HttpGet, Authorize]
         public ActionResult<Articles> GetUsers(string? searchQuery, int pageNumber = 1, int pageSize = 3)
@@ -38,16 +42,7 @@ namespace WebApplication1.Controllers
             }
             else
             {
-                List<UsersResponse> usersResponses = new List<UsersResponse>();
-                foreach (var user in users)
-                {
-                    UsersResponse userResponse = new UsersResponse
-                    {
-                        UserEmail = user.UserEmail,
-                        UserName = user.UserName,
-                    };
-                    usersResponses.Add(userResponse);
-                }
+                var usersResponses = _mapper.Map<List<UsersResponse>>(users);
                 return Ok(usersResponses);
             }
         }
@@ -59,11 +54,7 @@ namespace WebApplication1.Controllers
                 return NotFound("cannot find the specified user");
             }
             var user = _unitOfWork.Users.Get(userId);
-            UsersResponse userRespones = new UsersResponse
-            {
-                UserEmail = user.UserEmail,
-                UserName = user.UserName,
-            };
+            var userRespones = _mapper.Map<UsersResponse>(user);
             return Ok(userRespones);
         }
         [HttpGet("{UserId}/followers"), Authorize]
@@ -82,11 +73,7 @@ namespace WebApplication1.Controllers
             foreach (int id in followersId)
             {
                 var follower = _unitOfWork.Users.Get(id);
-                UsersResponse response = new UsersResponse
-                {
-                    UserName = follower.UserName,
-                    UserEmail = follower.UserEmail,
-                };
+                var response = _mapper.Map<UsersResponse>(follower);
                 usersResponses.Add(response);
             }
             return Ok(usersResponses);
@@ -107,11 +94,7 @@ namespace WebApplication1.Controllers
             foreach (int id in followingId)
             {
                 var followed = _unitOfWork.Users.Get(id);
-                UsersResponse response = new UsersResponse
-                {
-                    UserName = followed.UserName,
-                    UserEmail = followed.UserEmail,
-                };
+                var response = _mapper.Map<UsersResponse>(followed);
                 usersResponses.Add(response);
             }
             return Ok(usersResponses);
@@ -136,11 +119,7 @@ namespace WebApplication1.Controllers
             {
                 return Conflict("you already follow this user");
             }
-            Follow follow = new Follow
-            {
-                FollowedId = followRequest.UserToFollowId,
-                FollowerId = userId
-            };
+            var follow = _mapper.Map<Follow>((followRequest , userId));
             _unitOfWork.Follows.Add(follow);
             _unitOfWork.complete();
             return Ok("user followed succesfully");
@@ -205,12 +184,7 @@ namespace WebApplication1.Controllers
             {
                 var article = _unitOfWork.Articles.Get(favorite.ArticleId);
                 var author = _unitOfWork.Users.Get(article.UserId);
-                ArticleResponse articleResponse = new ArticleResponse
-                {
-                    Title = article.Title,
-                    Content = article.Content,
-                    AuthorUserName = author.UserName
-                };
+                var articleResponse = _mapper.Map<ArticleResponse>((article,user)); 
                 articleResponses.Add(articleResponse);
             }
             return Ok(articleResponses);
@@ -235,11 +209,7 @@ namespace WebApplication1.Controllers
             {
                 return Conflict("you already have this article in your favorites");
             }
-            Favorite favorite = new Favorite
-            {
-                ArticleId = request.ArticleId,
-                UserId = userId,
-            };
+            var favorite = _mapper.Map<Favorite>((request, userId));
             _unitOfWork.Favorites.Add(favorite);
             _unitOfWork.complete();
             return Ok("Article successfully added to favorites");

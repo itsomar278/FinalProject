@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.Models.Entites;
@@ -16,14 +17,15 @@ namespace WebApplication1.Controllers
         private readonly IAuthinticateService _authinticateService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ISessionDataManagment _sessionDataManagment;
+        private readonly IMapper _mapper;
         public AuthController(IUnitOfWork unitOfWork, IAuthinticateService authinticateService, IHttpContextAccessor httpContextAccessor,
-            ISessionDataManagment sessionDataManagment)
+            ISessionDataManagment sessionDataManagment , IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _authinticateService = authinticateService;
             _httpContextAccessor = httpContextAccessor;
             _sessionDataManagment = sessionDataManagment;
-
+            _mapper = mapper;
         }
         [HttpPost("register")]
         public ActionResult<Users> Rigester(UserRegisterRequest request)
@@ -34,13 +36,7 @@ namespace WebApplication1.Controllers
                 return BadRequest("Email or User Name has been used before");
             }
             _authinticateService.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
-            var user = new Users
-            {
-                UserEmail = request.UserEmail,
-                UserName = request.UserName,
-                PasswordHash = passwordHash,
-                PasswordSalt = passwordSalt
-            };
+            var user = _mapper.Map<Users>((request, passwordHash, passwordSalt));
             _unitOfWork.Users.Add(user);
             _unitOfWork.complete();
             return Ok(user);
@@ -157,13 +153,22 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             return Ok("user loged out succesfully");
         }
-        [HttpPost("update-password")]
+        [HttpPost("update-password") ,Authorize]
         public ActionResult<string> UpdatePassword(UserPasswordUpdateRequest request)
         {
             var user = _unitOfWork.Users.FindByEmail(request.UserEmail);
             if (user == null)
             {
                 return NotFound("There is no user with such email address");
+            }
+            var sessionUser = _sessionDataManagment.GetUserFromSession();
+            if(sessionUser == null)
+            {
+                return Unauthorized("you need to re-login");
+            }
+            if(sessionUser.UserId != user.UserId)
+            {
+                return Unauthorized("you cant change other user passwword");
             }
             if (!_authinticateService.VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt))
             {
@@ -175,7 +180,7 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             return Ok("Password updated successfully");
         }
-        [HttpPost("update-userName")]
+        [HttpPost("update-userName"),Authorize]
         public ActionResult<string> UpdateUserName(UpdateUserNameRequest request)
         {
             var user = _unitOfWork.Users.FindByEmail(request.UserEmail);
@@ -184,7 +189,11 @@ namespace WebApplication1.Controllers
                 return NotFound("There is no user with such email address");
             }
             var sessionUser = _sessionDataManagment.GetUserFromSession();
-            if(user.UserId != sessionUser.UserId)
+            if (sessionUser == null)
+            {
+                return Unauthorized("you need to re-login");
+            }
+            if (user.UserId != sessionUser.UserId)
             {
                 return Unauthorized();
             }
@@ -196,6 +205,5 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             return Ok("User Name updated successfully");
         }
-
     }
 }

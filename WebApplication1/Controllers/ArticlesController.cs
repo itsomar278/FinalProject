@@ -38,8 +38,6 @@ namespace WebApplication1.Controllers
                 var article = _mapper.Map<Articles>((request , user));
                 _unitOfWork.Articles.Add(article);
                 _unitOfWork.complete();
-                user.PublishedArticles.Add(article);
-                _unitOfWork.complete();
                 return Ok("Article posted");
             }
         }

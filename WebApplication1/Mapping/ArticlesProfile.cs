@@ -17,12 +17,10 @@ namespace WebApplication1.Mapping
                   .ForMember(a => a.AuthorUserName, m => m.MapFrom(source => source.user.UserName))
                   .ForMember(a => a.Content, m => m.MapFrom(source => source.article.Content))
                   .ForMember(a => a.Title, m => m.MapFrom(source => source.article.Title));
-            CreateMap<Articles, ArticlePostRequest>()
+            CreateMap<Articles , ArticlePostRequest>()
                 .ForMember(ap => ap.Title, m => m.MapFrom(source => source.Title))
                 .ForMember(ap => ap.Content, m => m.MapFrom(source => source.Content))
                 .ReverseMap();
-
-
         }
     }
 }
