@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -16,32 +17,28 @@ namespace WebApplication1.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ISessionDataManagment _sessionDataManagment;
+        private readonly IMapper _mapper;
         const int maxArticlesPageSize = 5;
-        public ArticlesController(IUnitOfWork unitOfWork, ISessionDataManagment sessionDataManagment)
+        public ArticlesController(IUnitOfWork unitOfWork, ISessionDataManagment sessionDataManagment , IMapper mapper )
         {
             _unitOfWork = unitOfWork;
             _sessionDataManagment = sessionDataManagment;
+            _mapper = mapper;
         }
         [HttpPost, Authorize]
         public ActionResult<Articles> PostArticle(ArticlePostRequest request)
         {
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrEmpty(userEmail))
+            var user = _sessionDataManagment.GetUserFromSession();
+            if (user==null)
             {
-                return BadRequest();
+                return Unauthorized();
             }
             else
             {
-                var user = _unitOfWork.Users.FindByEmail(userEmail);
-                Articles Article = new Articles
-                {
-                    Title = request.Title,
-                    Content = request.Content,
-                    UserId = user.UserId
-                };
-                _unitOfWork.Articles.Add(Article);
+                var article = _mapper.Map<Articles>((request , user));
+                _unitOfWork.Articles.Add(article);
                 _unitOfWork.complete();
-                user.PublishedArticles.Add(Article);
+                user.PublishedArticles.Add(article);
                 _unitOfWork.complete();
                 return Ok("Article posted");
             }
@@ -56,20 +53,16 @@ namespace WebApplication1.Controllers
             var articles = _unitOfWork.Articles.GetArticles(title, searchQuery, pageNumber, pageSize);
             if (articles.Count() == 0)
             {
-                return NotFound();
+                return Ok("no articles posted yet");
             }
             else
             {
                 List<ArticleResponse> articleResponses = new List<ArticleResponse>();
                 foreach (var article in articles)
                 {
-                    ArticleResponse ArticleResponse = new ArticleResponse
-                    {
-                        AuthorUserName = _unitOfWork.Users.Find(u => u.UserId == article.UserId).First().UserName,
-                        Title = article.Title,
-                        Content = article.Content,
-                    };
-                    articleResponses.Add(ArticleResponse);
+                   var user =  _unitOfWork.Users.Get(article.UserId);
+                    var response = _mapper.Map<ArticleResponse>((article, user));
+                    articleResponses.Add(response);
                 }
                 return Ok(articleResponses);
             }
@@ -77,18 +70,14 @@ namespace WebApplication1.Controllers
         [HttpGet("{ArticleId}"), Authorize]
         public ActionResult GetArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
-            if (_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
             {
                 return NotFound("cannot find the specified article");
             }
             var article = _unitOfWork.Articles.Get(articleId);
-            ArticleResponse ArticleResponse = new ArticleResponse
-            {
-                AuthorUserName = _unitOfWork.Users.Find(u => u.UserId == article.UserId).First().UserName,
-                Title = article.Title,
-                Content = article.Content,
-            };
-            return Ok(ArticleResponse);
+            var user = _unitOfWork.Users.Get(article.UserId);
+            var response = _mapper.Map<ArticleResponse>((article , user));
+            return Ok(response);
         }
         [HttpDelete("{ArticleId}"), Authorize]
         public ActionResult DeleteArticle([FromRoute(Name = "ArticleId")] int articleId)
@@ -121,22 +110,16 @@ namespace WebApplication1.Controllers
             {
                 return Unauthorized();
             }
-            ArticlePostRequest articlePostRequest = new ArticlePostRequest
-            {
-                Title = articleToUpdate.Title,
-                Content = articleToUpdate.Content
-            };
+             var articlePostRequest = _mapper.Map<ArticlePostRequest>(articleToUpdate);
             patchDocument.ApplyTo(articlePostRequest, ModelState);
             if (!ModelState.IsValid)
             {
                 return BadRequest();
             }
-            articleToUpdate.Title = articlePostRequest.Title;
-            articleToUpdate.Content = articlePostRequest.Content;
+            _mapper.Map<ArticlePostRequest, Articles>(articlePostRequest, articleToUpdate);
             _unitOfWork.complete();
             return Ok("Article successfully updated");
         }
-
         [HttpGet("{ArticleId}/Comments"), Authorize]
         public ActionResult<Comments> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
@@ -151,17 +134,14 @@ namespace WebApplication1.Controllers
                 {
                     return Ok("there is no comments on this article ");
                 }
-                List<CommentResponse> response = new List<CommentResponse>();
+                List<CommentResponse> responses = new List<CommentResponse>();
                 foreach (var comment in comments)
                 {
-                    CommentResponse commentResponse = new CommentResponse
-                    {
-                        UserName = _unitOfWork.Users.Find(u => u.UserId == comment.UserId).First().UserName,
-                        CommentContent = comment.CommentContent
-                    };
-                    response.Add(commentResponse);
+                    var user = _unitOfWork.Users.Get(comment.UserId);
+                    var commentResponse = _mapper.Map<CommentResponse>((comment , user));
+                    responses.Add(commentResponse);
                 }
-                return Ok(response);
+                return Ok(responses);
             }
         }
         [HttpGet("{ArticleId}/Comments/{CommentId}"), Authorize]
@@ -176,11 +156,8 @@ namespace WebApplication1.Controllers
                 return Ok("the specified comment cannot be found ");
             }
             var comment = _unitOfWork.Comments.Get(commentId);
-            CommentResponse response = new CommentResponse
-            {
-                CommentContent = comment.CommentContent,
-                UserName = _unitOfWork.Users.Get(comment.UserId).UserName
-            };
+            var user = _unitOfWork.Users.Get(comment.UserId);
+            var response = _mapper.Map<CommentResponse>((comment , user));
             return Ok(response);
         }
         [HttpPost("{ArticleId}/Comments"), Authorize]
@@ -190,43 +167,36 @@ namespace WebApplication1.Controllers
             {
                 return NotFound("specified article cannot be found");
             }
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrEmpty(userEmail))
+            var user = _sessionDataManagment.GetUserFromSession();
+            if (user==null)
             {
-                return BadRequest();
+                return Unauthorized();
             }
-            var user = _unitOfWork.Users.FindByEmail(userEmail);
-            Comments comment = new Comments
-            {
-                UserId = user.UserId,
-                ArticleId = articleId,
-                CommentContent = request.CommentContent,
-            };
+            var comment = _mapper.Map<Comments>((request, user, articleId));
             _unitOfWork.Comments.Add(comment);
             _unitOfWork.complete();
             return Ok("comment succesfully posted !");
         }
-        [HttpDelete("{ArticleId}/Comments/{CommentId}"), Authorize]//comment delete request should be added . 
-        public ActionResult DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)
+        [HttpDelete("{ArticleId}/Comments"), Authorize]
+        public ActionResult DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, CommentDeleteRequest request)
         {
-            var userEmail = User.FindFirstValue(ClaimTypes.Email);
-            if (string.IsNullOrEmpty(userEmail))
+           if(!_unitOfWork.Comments.DoesExist(c => c.CommentId == request.commentId))
+           {
+                return NotFound("there is no comment with the specified id");
+           }
+           var comment = _unitOfWork.Comments.Get(request.commentId);
+            var user = _sessionDataManagment.GetUserFromSession();
+            if(user==null)
             {
-                return BadRequest();
+                return Unauthorized("you gotta re-login");
             }
-            var user = _unitOfWork.Users.FindByEmail(userEmail);
-            var commentToDelete = _unitOfWork.Comments.Get(commentId);
-            if (commentToDelete == null || commentToDelete.ArticleId != articleId)
+            if(user.UserId != comment.UserId)
             {
-                return NotFound("cannot find the specified comment on this article");
+                return Unauthorized("you cant delete another user comment");
             }
-            if (user.UserId != commentToDelete.UserId)
-            {
-                return Unauthorized("you cant delete other user comments !");
-            }
-            _unitOfWork.Comments.Remove(commentToDelete);
+            _unitOfWork.Comments.Remove(comment);
             _unitOfWork.complete();
-            return Ok("comment deleted succesfully");
+            return Ok("comment deleted successfully");
         }
     }
 }
