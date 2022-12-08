@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+<Node Id="IModel" Label="ProjectDbContext" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot" PropertyAccessMode="PropertyAccessMode.Default" ProductVersion="6.0.11" Annotations="BaseTypeDiscoveryConvention:DerivedTypes: System.Collections.Generic.Dictionary`2[System.Type,System.Collections.Generic.List`1[Microsoft.EntityFrameworkCore.Metadata.IConventionEntityType]]
+Relational:MaxIdentifierLength: 128
+RelationshipDiscoveryConvention:InverseNavigationCandidates: System.Collections.Generic.Dictionary`2[System.Type,System.Collections.Generic.SortedSet`1[System.Type]]
+SqlServer:ValueGenerationStrategy: IdentityColumn" Category="Model" Group="Expanded" />
+<Node Id = "Articles" Label="Articles" Name="Articles" BaseClass="" IsAbstract="False" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot"  Annotations="Relational:TableName: Articles
+RelationshipDiscoveryConvention:NavigationCandidates: System.Collections.Immutable.ImmutableSortedDictionary`2[System.Reflection.PropertyInfo,System.ValueTuple`2[System.Type,System.Nullable`1[System.Boolean]]]" Category="EntityType" Group="Expanded" />
+<Node Id = "Comments" Label="Comments" Name="Comments" BaseClass="" IsAbstract="False" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot"  Annotations="Relational:TableName: Comments
+RelationshipDiscoveryConvention:NavigationCandidates: System.Collections.Immutable.ImmutableSortedDictionary`2[System.Reflection.PropertyInfo,System.ValueTuple`2[System.Type,System.Nullable`1[System.Boolean]]]" Category="EntityType" Group="Expanded" />
+<Node Id = "Articles.ArticleId" Label="ArticleId (int)" Name="ArticleId" Category="Property Primary" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="SqlServer:ValueGenerationStrategy: IdentityColumn" IsPrimaryKey="True" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="ValueGenerated.OnAdd" />
+<Node Id = "Articles.Comments" Label="Comments (*)" Name="Comments" Category="Navigation Collection" Type="List&lt;Comments&gt;"  Field="" Dependent="Comments" Principal="" Inverse="Article" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Articles.FavouredBy" Label="FavouredBy (*)" Name="FavouredBy" Category="Navigation Collection" Type="List&lt;Favorite&gt;"  Field="" Dependent="Favorite" Principal="" Inverse="Article" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Articles.User" Label="User (1)" Name="User" Category="Navigation Property" Type="Users"  Field="" Dependent="" Principal="Users" Inverse="PublishedArticles" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Articles.Content" Label="Content (string)" Name="Content" Category="Property Required" Type="string" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Articles.Title" Label="Title (string)" Name="Title" Category="Property Required" Type="string" MaxLength="(200)" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="MaxLength: 200" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Articles.UserId" Label="UserId (int)" Name="UserId" Category="Property Foreign" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="True" IsRequired="True" IsIndexed="True" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Favorite" Label="Favorite" Name="Favorite" BaseClass="" IsAbstract="False" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot"  Annotations="Relational:TableName: Favorites
+RelationshipDiscoveryConvention:NavigationCandidates: System.Collections.Immutable.ImmutableSortedDictionary`2[System.Reflection.PropertyInfo,System.ValueTuple`2[System.Type,System.Nullable`1[System.Boolean]]]" Category="EntityType" Group="Expanded" />
+<Node Id = "Comments.CommentId" Label="CommentId (int)" Name="CommentId" Category="Property Primary" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="SqlServer:ValueGenerationStrategy: IdentityColumn" IsPrimaryKey="True" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="ValueGenerated.OnAdd" />
+<Node Id = "Comments.Article" Label="Article (1)" Name="Article" Category="Navigation Property" Type="Articles"  Field="" Dependent="" Principal="Articles" Inverse="Comments" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Comments.User" Label="User (1)" Name="User" Category="Navigation Property" Type="Users"  Field="" Dependent="" Principal="Users" Inverse="" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Comments.ArticleId" Label="ArticleId (int)" Name="ArticleId" Category="Property Foreign" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="True" IsRequired="True" IsIndexed="True" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Comments.CommentContent" Label="CommentContent (string)" Name="CommentContent" Category="Property Required" Type="string" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Comments.UserId" Label="UserId (int)" Name="UserId" Category="Property Foreign" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="True" IsRequired="True" IsIndexed="True" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Follow" Label="Follow" Name="Follow" BaseClass="" IsAbstract="False" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot"  Annotations="Relational:TableName: Follows
+RelationshipDiscoveryConvention:AmbiguousNavigations: System.Collections.Immutable.ImmutableSortedDictionary`2[System.Reflection.MemberInfo,System.Type]
+RelationshipDiscoveryConvention:NavigationCandidates: System.Collections.Immutable.ImmutableSortedDictionary`2[System.Reflection.PropertyInfo,System.ValueTuple`2[System.Type,System.Nullable`1[System.Boolean]]]" Category="EntityType" Group="Expanded" />
+<Node Id = "Favorite.ArticleId" Label="ArticleId (int)" Name="ArticleId" Category="Property Primary" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="True" IsForeignKey="True" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Favorite.Article" Label="Article (1)" Name="Article" Category="Navigation Property" Type="Articles"  Field="" Dependent="" Principal="Articles" Inverse="FavouredBy" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Favorite.User" Label="User (1)" Name="User" Category="Navigation Property" Type="Users"  Field="" Dependent="" Principal="Users" Inverse="FavoriteArticles" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Favorite.UserId" Label="UserId (int)" Name="UserId" Category="Property Primary" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="True" IsForeignKey="True" IsRequired="True" IsIndexed="True" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "RefreshTokens" Label="RefreshTokens" Name="RefreshTokens" BaseClass="" IsAbstract="False" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot"  Annotations="Relational:TableName: RefreshTokens
+RelationshipDiscoveryConvention:NavigationCandidates: System.Collections.Immutable.ImmutableSortedDictionary`2[System.Reflection.PropertyInfo,System.ValueTuple`2[System.Type,System.Nullable`1[System.Boolean]]]" Category="EntityType" Group="Expanded" />
+<Node Id = "Follow.FollowerId" Label="FollowerId (int)" Name="FollowerId" Category="Property Primary" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="True" IsForeignKey="True" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Follow.FollowedUser" Label="FollowedUser (1)" Name="FollowedUser" Category="Navigation Property" Type="Users"  Field="" Dependent="" Principal="Users" Inverse="Followers" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Follow.FollowerUser" Label="FollowerUser (1)" Name="FollowerUser" Category="Navigation Property" Type="Users"  Field="" Dependent="" Principal="Users" Inverse="Following" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Follow.FollowedId" Label="FollowedId (int)" Name="FollowedId" Category="Property Primary" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="True" IsForeignKey="True" IsRequired="True" IsIndexed="True" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Users" Label="Users" Name="Users" BaseClass="" IsAbstract="False" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot"  Annotations="Relational:TableName: Users
+RelationshipDiscoveryConvention:AmbiguousNavigations: System.Collections.Immutable.ImmutableSortedDictionary`2[System.Reflection.MemberInfo,System.Type]
+RelationshipDiscoveryConvention:NavigationCandidates: System.Collections.Immutable.ImmutableSortedDictionary`2[System.Reflection.PropertyInfo,System.ValueTuple`2[System.Type,System.Nullable`1[System.Boolean]]]" Category="EntityType" Group="Expanded" />
+<Node Id = "RefreshTokens.TokenId" Label="TokenId (int)" Name="TokenId" Category="Property Primary" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="SqlServer:ValueGenerationStrategy: IdentityColumn" IsPrimaryKey="True" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="ValueGenerated.OnAdd" />
+<Node Id = "RefreshTokens.User" Label="User (1)" Name="User" Category="Navigation Property" Type="Users"  Field="" Dependent="" Principal="Users" Inverse="RefreshToken" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "RefreshTokens.Created" Label="Created (DateTime)" Name="Created" Category="Property Required" Type="DateTime" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "RefreshTokens.Expires" Label="Expires (DateTime)" Name="Expires" Category="Property Required" Type="DateTime" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "RefreshTokens.Token" Label="Token (string)" Name="Token" Category="Property Required" Type="string" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "RefreshTokens.UserId" Label="UserId (int)" Name="UserId" Category="Property Foreign" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="True" IsRequired="True" IsIndexed="True" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Users" Label="Users" Name="Users" BaseClass="" IsAbstract="False" ChangeTrackingStrategy="ChangeTrackingStrategy.Snapshot"  Annotations="" Category="EntityType" Group="Expanded" />
+<Node Id = "Users.UserId" Label="UserId (int)" Name="UserId" Category="Property Primary" Type="int" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="SqlServer:ValueGenerationStrategy: IdentityColumn" IsPrimaryKey="True" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="ValueGenerated.OnAdd" />
+<Node Id = "Users.FavoriteArticles" Label="FavoriteArticles (*)" Name="FavoriteArticles" Category="Navigation Collection" Type="List&lt;Favorite&gt;"  Field="" Dependent="Favorite" Principal="" Inverse="User" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Users.Followers" Label="Followers (*)" Name="Followers" Category="Navigation Collection" Type="List&lt;Follow&gt;"  Field="" Dependent="Follow" Principal="" Inverse="FollowedUser" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Users.Following" Label="Following (*)" Name="Following" Category="Navigation Collection" Type="List&lt;Follow&gt;"  Field="" Dependent="Follow" Principal="" Inverse="FollowerUser" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Users.PublishedArticles" Label="PublishedArticles (*)" Name="PublishedArticles" Category="Navigation Collection" Type="List&lt;Articles&gt;"  Field="" Dependent="Articles" Principal="" Inverse="User" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Users.RefreshToken" Label="RefreshToken (1)" Name="RefreshToken" Category="Navigation Property" Type="RefreshTokens"  Field="" Dependent="RefreshTokens" Principal="" Inverse="User" PropertyAccessMode="PropertyAccessMode.Default" />
+<Node Id = "Users.PasswordHash" Label="PasswordHash (byte[])" Name="PasswordHash" Category="Property Required" Type="byte[]" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Users.PasswordSalt" Label="PasswordSalt (byte[])" Name="PasswordSalt" Category="Property Required" Type="byte[]" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Users.RefreshTokenId" Label="RefreshTokenId (int?)" Name="RefreshTokenId" Category="Property Optional" Type="int?" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="False" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Users.UserEmail" Label="UserEmail (string)" Name="UserEmail" Category="Property Required" Type="string" MaxLength="None" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+<Node Id = "Users.UserName" Label="UserName (string)" Name="UserName" Category="Property Required" Type="string" MaxLength="(30)" Field="" PropertyAccessMode="PropertyAccessMode.Default" BeforeSaveBehavior="PropertySaveBehavior.Save" AfterSaveBehavior="PropertySaveBehavior.Save" Annotations="MaxLength: 30" IsPrimaryKey="False" IsForeignKey="False" IsRequired="True" IsIndexed="False" IsShadow="False" IsAlternateKey="False" IsConcurrencyToken="False" IsUnicode="True" ValueGenerated="None" />
+  </Nodes>
+  <Links>
+<Link Source = "IModel" Target="Articles" Category="Contains" />
+<Link Source = "IModel" Target="Comments" Category="Contains" />
+<Link Source = "Articles" Target="Articles.Comments" Category="Contains" />
+<Link Source = "Articles" Target="Articles.FavouredBy" Category="Contains" />
+<Link Source = "Articles" Target="Articles.User" Category="Contains" />
+<Link Source = "Articles" Target="Articles.ArticleId" Category="Contains" />
+<Link Source="Articles" Target="Users" From="Articles.UserId" To="Users.UserId" Name="Articles -> Users" Annotations="" IsUnique="False" Label="1:*" Category="Foreign Key" />
+<Link Source = "Articles" Target="Articles.Content" Category="Contains" />
+<Link Source = "Articles" Target="Articles.Title" Category="Contains" />
+<Link Source = "Articles" Target="Articles.UserId" Category="Contains" />
+<Link Source = "IModel" Target="Favorite" Category="Contains" />
+<Link Source = "Comments" Target="Comments.Article" Category="Contains" />
+<Link Source = "Comments" Target="Comments.User" Category="Contains" />
+<Link Source = "Comments" Target="Comments.CommentId" Category="Contains" />
+<Link Source="Comments" Target="Articles" From="Comments.ArticleId" To="Articles.ArticleId" Name="Comments -> Articles" Annotations="" IsUnique="False" Label="1:*" Category="Foreign Key" />
+<Link Source="Comments" Target="Users" From="Comments.UserId" To="Users.UserId" Name="Comments -> Users" Annotations="" IsUnique="False" Label="1:*" Category="Foreign Key" />
+<Link Source = "Comments" Target="Comments.ArticleId" Category="Contains" />
+<Link Source = "Comments" Target="Comments.CommentContent" Category="Contains" />
+<Link Source = "Comments" Target="Comments.UserId" Category="Contains" />
+<Link Source = "IModel" Target="Follow" Category="Contains" />
+<Link Source = "Favorite" Target="Favorite.Article" Category="Contains" />
+<Link Source = "Favorite" Target="Favorite.User" Category="Contains" />
+<Link Source = "Favorite" Target="Favorite.ArticleId" Category="Contains" />
+<Link Source="Favorite" Target="Articles" From="Favorite.ArticleId" To="Articles.ArticleId" Name="Favorite -> Articles" Annotations="" IsUnique="False" Label="1:*" Category="Foreign Key" />
+<Link Source="Favorite" Target="Users" From="Favorite.UserId" To="Users.UserId" Name="Favorite -> Users" Annotations="" IsUnique="False" Label="1:*" Category="Foreign Key" />
+<Link Source = "Favorite" Target="Favorite.UserId" Category="Contains" />
+<Link Source = "IModel" Target="RefreshTokens" Category="Contains" />
+<Link Source = "Follow" Target="Follow.FollowedUser" Category="Contains" />
+<Link Source = "Follow" Target="Follow.FollowerUser" Category="Contains" />
+<Link Source = "Follow" Target="Follow.FollowerId" Category="Contains" />
+<Link Source="Follow" Target="Users" From="Follow.FollowedId" To="Users.UserId" Name="Follow -> Users" Annotations="" IsUnique="False" Label="1:*" Category="Foreign Key" />
+<Link Source="Follow" Target="Users" From="Follow.FollowerId" To="Users.UserId" Name="Follow -> Users" Annotations="" IsUnique="False" Label="1:*" Category="Foreign Key" />
+<Link Source = "Follow" Target="Follow.FollowedId" Category="Contains" />
+<Link Source = "IModel" Target="Users" Category="Contains" />
+<Link Source = "RefreshTokens" Target="RefreshTokens.User" Category="Contains" />
+<Link Source = "RefreshTokens" Target="RefreshTokens.TokenId" Category="Contains" />
+<Link Source="RefreshTokens" Target="Users" From="RefreshTokens.UserId" To="Users.UserId" Name="RefreshTokens -> Users" Annotations="" IsUnique="True" Label="1:1" Category="Foreign Key" />
+<Link Source = "RefreshTokens" Target="RefreshTokens.Created" Category="Contains" />
+<Link Source = "RefreshTokens" Target="RefreshTokens.Expires" Category="Contains" />
+<Link Source = "RefreshTokens" Target="RefreshTokens.Token" Category="Contains" />
+<Link Source = "RefreshTokens" Target="RefreshTokens.UserId" Category="Contains" />
+<Link Source = "IModel" Target="Users" Category="Contains" />
+<Link Source = "Users" Target="Users.FavoriteArticles" Category="Contains" />
+<Link Source = "Users" Target="Users.Followers" Category="Contains" />
+<Link Source = "Users" Target="Users.Following" Category="Contains" />
+<Link Source = "Users" Target="Users.PublishedArticles" Category="Contains" />
+<Link Source = "Users" Target="Users.RefreshToken" Category="Contains" />
+<Link Source = "Users" Target="Users.UserId" Category="Contains" />
+<Link Source = "Users" Target="Users.PasswordHash" Category="Contains" />
+<Link Source = "Users" Target="Users.PasswordSalt" Category="Contains" />
+<Link Source = "Users" Target="Users.RefreshTokenId" Category="Contains" />
+<Link Source = "Users" Target="Users.UserEmail" Category="Contains" />
+<Link Source = "Users" Target="Users.UserName" Category="Contains" />
+  </Links>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="EntityType" ValueLabel="True">
+      <Condition Expression="HasCategory('EntityType')" />
+      <Setter Property="Background" Value="#FFC0C0C0" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Property Primary" ValueLabel="True">
+      <Condition Expression="HasCategory('Property Primary')" />
+      <Setter Property="Background" Value="#FF008000" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Property Optional" ValueLabel="True">
+      <Condition Expression="HasCategory('Property Optional')" />
+      <Setter Property="Background" Value="#FF808040" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Property Foreign" ValueLabel="True">
+      <Condition Expression="HasCategory('Property Foreign')" />
+      <Setter Property="Background" Value="#FF8080FF" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Property Required" ValueLabel="True">
+      <Condition Expression="HasCategory('Property Required')" />
+      <Setter Property="Background" Value="#FFC0A000" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Navigation Property" ValueLabel="True">
+      <Condition Expression="HasCategory('Navigation Property')" />
+      <Setter Property="Background" Value="#FF990000" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Navigation Collection" ValueLabel="True">
+      <Condition Expression="HasCategory('Navigation Collection')" />
+      <Setter Property="Background" Value="#FFFF3232" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Model" ValueLabel="True">
+      <Condition Expression="HasCategory('Model')" />
+      <Setter Property="Background" Value="#FFFFFFFF" />
+    </Style>
+  </Styles>
+  <Properties>
+    <Property Id="Name" Group="Model Properties" DataType="System.String" />
+    <Property Id="Field"  Description="Backing field" Group="Model Properties" DataType="System.String" />
+    <Property Id="Type"  Description="CLR data type" Group="Model Properties" DataType="System.String" />
+    <Property Id="To" Description="Source property" Group="Model Properties" DataType="System.String" />
+    <Property Id="From" Description="Target property" Group="Model Properties" DataType="System.String" />
+    <Property Id="Dependent" Description="Dependent entity" Group="Model Properties" DataType="System.String" />
+    <Property Id="Inverse" Description="Inverse entity" Group="Model Properties" DataType="System.String" />
+    <Property Id="Principal" Description="Principal entity" Group="Model Properties" DataType="System.String" />    
+    <Property Id="Annotations" Description="Annotations" Group="Model Properties" DataType="System.String" />
+    <Property Id="BaseClass"  Description="Base class" Group="Model Properties" DataType="System.String" />
+    <Property Id="ChangeTrackingStrategy" Description="Change tracking strategy" Group="Model Properties" DataType="System.String" />
+    <Property Id="IsUnique" Group="Model Properties" DataType="System.Boolean" />
+    <Property Id="IsAbstract" Group="Model Properties" DataType="System.Boolean" />
+    <Property Id="ProductVersion" Label="Product Version" Description="EF Core product version" Group="Model Properties" DataType="System.String" />
+    <Property Id="IsIndexed" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="IsRequired" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="IsPrimaryKey" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="IsForeignKey" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="IsShadow" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="IsAlternateKey" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="IsConcurrencyToken" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="IsIndexed" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="IsUnicode" Group="Property Flags" DataType="System.Boolean" />
+    <Property Id="ValueGenerated" Group="Property Flags" DataType="System.String" />
+    <Property Id="BeforeSaveBehavior" Group="Property Flags" DataType="System.String" />
+    <Property Id="AfterSaveBehavior" Group="Property Flags" DataType="System.String" />
+    <Property Id="PropertyAccessMode" Group="Property Flags" DataType="System.String" />
+  </Properties>
+</DirectedGraph>

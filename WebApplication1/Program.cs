@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Microsoft.VisualBasic;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
 using WebApplication1.DataAccess;
@@ -13,10 +14,11 @@ using WebApplication1.DataAccess.Repositories.FavoriteRepository;
 using WebApplication1.DataAccess.Repositories.FollowRepository;
 using WebApplication1.DataAccess.Repositories.RefreshTokenRepository;
 using WebApplication1.DataAccess.Repositories.UsersRepository;
+using WebApplication1.DataAccess.UnitOfWorks;
+using WebApplication1.Mapping;
 using WebApplication1.Services.Authentication;
 using WebApplication1.Services.SessionDataManagment;
 using WebApplication1.Services.SessionManagment;
-using WebApplication1.UnitOfWorks;
 
 namespace WebApplication1
 {
@@ -36,7 +38,7 @@ namespace WebApplication1
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            builder.Services.AddAutoMapper(typeof(Program).Assembly);
+            builder.Services.AddAutoMapper(typeof(ArticlesProfile) , typeof(CommentsProfile) , typeof(UsersProfile));
             builder.Services.AddDbContext<ProjectDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));

@@ -3,11 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
 using WebApplication1.Services.SessionManagment;
-using WebApplication1.UnitOfWorks;
 
 namespace WebApplication1.Controllers
 {

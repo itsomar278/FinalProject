@@ -1,12 +1,12 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Services.Authentication;
 using WebApplication1.Services.SessionManagment;
-using WebApplication1.UnitOfWorks;
 
 namespace WebApplication1.Controllers
 {
