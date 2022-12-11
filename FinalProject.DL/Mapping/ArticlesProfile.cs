@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
@@ -9,7 +10,7 @@ namespace WebApplication1.Mapping
     {
         public ArticlesProfile()
         {
-            CreateMap<(ArticlePostRequest request, Users user), Articles>()
+            CreateMap<(ArticlePostRequest request, UserSessionModel user), Articles>()
                    .ForMember(a => a.UserId, m => m.MapFrom(source => source.user.UserId))
                    .ForMember(a => a.Content, m => m.MapFrom(source => source.request.Content))
                    .ForMember(sss => sss.Title, m => m.MapFrom(source => source.request.Title));

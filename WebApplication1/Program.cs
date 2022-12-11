@@ -1,3 +1,5 @@
+using FinalProject.DL;
+using FinalProject.DL.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -40,7 +42,7 @@ namespace WebApplication1
             builder.Services.AddSwaggerGen();
             builder.Services.AddAutoMapper(typeof(ArticlesProfile) , typeof(CommentsProfile) , typeof(UsersProfile));
             builder.Services.AddDbContext<ProjectDbContext>(options =>
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection") , b => b.MigrationsAssembly("FinalProject.DAL")));
             builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddTransient<IUnitOfWork, UnitOfWork>();
             builder.Services.AddTransient<IUsersRepository, UsersRepository>();
@@ -52,6 +54,7 @@ namespace WebApplication1
             builder.Services.AddTransient<ISessionDataManagment , SessionDataManagment>();
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IAuthinticateService , AuthenticationService>();
+            builder.Services.AddScoped<IArticleService , ArticlesService>();
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(1);
@@ -92,6 +95,9 @@ namespace WebApplication1
     {
         policy.WithOrigins("https://localhost:7248/").AllowAnyMethod().AllowAnyHeader();
     }));
+            builder.Services.AddMvc(
+                options => { options.Filters.Add(new MyExceptionFilter()); }
+                );
             var app = builder.Build();
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

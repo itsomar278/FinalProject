@@ -36,12 +36,14 @@ namespace WebApplication1.Controllers
             {
                 return BadRequest("Email or User Name has been used before");
             }
+
             _authinticateService.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
             var user = _mapper.Map<Users>((request, passwordHash, passwordSalt));
             _unitOfWork.Users.Add(user);
             _unitOfWork.complete();
             return Ok(user);
         }
+
         [HttpPost("login")]
         public ActionResult<Users> Login(UserLoginRequest request)
         {
@@ -49,17 +51,20 @@ namespace WebApplication1.Controllers
             {
                 return NotFound("There is no user with such email address");
             }
+
             var userResult = _unitOfWork.Users.FindByEmail(request.UserEmail);
             if (!_authinticateService.VerifyPasswordHash(request.Password, userResult.PasswordHash, userResult.PasswordSalt))
             {
                 return BadRequest("wrong passowrd !!!!!");
             }
+
             var refreshTokenResult = _unitOfWork.RefreshTokens.Find(t => t.UserId == userResult.UserId);
             if (refreshTokenResult.Count() != 0)
             {
                 _unitOfWork.RefreshTokens.RemoveRange(refreshTokenResult);
                 _unitOfWork.complete();
             }
+
             string token = _authinticateService.CreateToken(userResult);
             RefreshTokens refreshToken = _authinticateService.GenerateRefreshToken(userResult.UserId);
             var cookieOptions = new CookieOptions
@@ -86,53 +91,52 @@ namespace WebApplication1.Controllers
                 foreach (var cookie in Request.Cookies.Keys)
                 {
                     if (cookie == ".AspNetCore.Session")
-                    {
                         Response.Cookies.Delete(cookie);
-                    }
                 }
                 return Unauthorized("you need to re-login");
             }
+
             var user = _sessionDataManagment.GetUserFromSession();
-            if (user == null)
+            if (user is null)
             {
                 foreach (var cookie in Request.Cookies.Keys)
                 {
                     if (cookie == ".AspNetCore.Session")
-                    {
                         Response.Cookies.Delete(cookie);
-                    }
                 }
                 return Unauthorized("you need to re-login");
             }
-            var myRefreshToken = _unitOfWork.RefreshTokens.Get((user.RefreshTokenId.Value));
+
+            var myRefreshToken = _unitOfWork.RefreshTokens.Get((user.RefreshTokenId));
             if (myRefreshToken.Token != refreshToken || myRefreshToken.Expires < DateTime.Now)
             {
                 foreach (var cookie in Request.Cookies.Keys)
                 {
                     if (cookie == ".AspNetCore.Session")
-                    {
                         Response.Cookies.Delete(cookie);
-                    }
+                    
                 }
                 return Unauthorized("you need to re-login");
             }
+            var userr = _unitOfWork.Users.Get(user.UserId);
             _unitOfWork.RefreshTokens.Remove(myRefreshToken);
-            string token = _authinticateService.CreateToken(user);
+            string token = _authinticateService.CreateToken(userr);
             var newRefreshToken = _authinticateService.GenerateRefreshToken(user.UserId);
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Expires = newRefreshToken.Expires
             };
+
             Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
             _unitOfWork.RefreshTokens.Add(newRefreshToken); ;
-            _unitOfWork.complete();
             _unitOfWork.Users.UpdateUserRefreshToken(user.UserId, newRefreshToken.TokenId);
-            _unitOfWork.complete();
+
             var userInSession = _mapper.Map<UserSessionModel>(user);
             _sessionDataManagment.StoreUserInSession(userInSession);
             return Ok(token);
         }
+
         [HttpPost("logout"), Authorize]
         public ActionResult<string> Logout()
         {
@@ -156,6 +160,7 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             return Ok("user loged out succesfully");
         }
+
         [HttpPost("update-password") ,Authorize]
         public ActionResult<string> UpdatePassword(UserPasswordUpdateRequest request)
         {
@@ -183,6 +188,7 @@ namespace WebApplication1.Controllers
             _unitOfWork.complete();
             return Ok("Password updated successfully");
         }
+
         [HttpPost("update-userName"),Authorize]
         public ActionResult<string> UpdateUserName(UpdateUserNameRequest request)
         {

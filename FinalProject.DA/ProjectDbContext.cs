@@ -22,12 +22,12 @@ namespace WebApplication1.DataAccess
                         .HasOne<Users>(f => f.User)
                         .WithMany(u => u.FavoriteArticles)
                         .HasForeignKey(f => f.UserId)
-                        .OnDelete(DeleteBehavior.Restrict); ;
+                        .OnDelete(DeleteBehavior.Cascade); 
             modelBuilder.Entity<Favorite>()
                        .HasOne<Articles>(f => f.Article)
                        .WithMany(a => a.FavouredBy)
                        .HasForeignKey(f => f.ArticleId)
-                       .OnDelete(DeleteBehavior.Restrict);
+                       .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Follow>().
                         HasKey(uu =>
                         new

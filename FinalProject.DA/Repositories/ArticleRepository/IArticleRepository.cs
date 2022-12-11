@@ -1,5 +1,4 @@
 ﻿using WebApplication1.Models.Entites;
-using WebApplication1.Models.Response;
 
 namespace WebApplication1.DataAccess.Repositories.ArticleRepository
 {

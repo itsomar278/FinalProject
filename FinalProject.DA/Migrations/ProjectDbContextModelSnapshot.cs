@@ -46,7 +46,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Articles");
+                    b.ToTable("Articles", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entites.Comments", b =>
@@ -73,7 +73,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Comments");
+                    b.ToTable("Comments", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entites.Favorite", b =>
@@ -88,7 +88,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Favorites");
+                    b.ToTable("Favorites", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entites.Follow", b =>
@@ -103,7 +103,7 @@ namespace WebApplication1.Migrations
 
                     b.HasIndex("FollowedId");
 
-                    b.ToTable("Follows");
+                    b.ToTable("Follows", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entites.RefreshTokens", b =>
@@ -132,7 +132,7 @@ namespace WebApplication1.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("RefreshTokens");
+                    b.ToTable("RefreshTokens", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entites.Users", b =>
@@ -165,7 +165,7 @@ namespace WebApplication1.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("WebApplication1.Models.Entites.Articles", b =>

@@ -13,12 +13,12 @@ namespace WebApplication1.Services.SessionDataManagment
         {
             _httpContextAccessor = httpContextAccessor;
         }
-        public Users GetUserFromSession()
+        public UserSessionModel GetUserFromSession()
         {
             string userJson = _httpContextAccessor.HttpContext.Session.GetString("MyUser");
             if (userJson != null)
             {
-                return JsonConvert.DeserializeObject<Users>(userJson);
+                return JsonConvert.DeserializeObject<UserSessionModel>(userJson);
             }
             else
             {
