@@ -11,7 +11,7 @@ using WebApplication1.Models.Requests;
 using WebApplication1.Models;
 using WebApplication1.Models.Response;
 
-namespace FinalProject.DL.Services
+namespace Domain.Services.ArticlesService
 {
     public interface IArticleService
     {
@@ -19,12 +19,11 @@ namespace FinalProject.DL.Services
         Task<IEnumerable<ArticleResponse>> GetArticles(string? title, string? searchQuery, int pageNumber = 1, int pageSize = 2);
         Task<ArticleResponse> GetArticle(int articleId);
         Task<ActionResult> DeleteArticle(int articleId, UserSessionModel user);
-        Task<ActionResult> ArticlePartialUpdate(int articleId, JsonPatchDocument<ArticlePostRequest> patchDocument , UserSessionModel user);
+        Task<ActionResult> ArticlePartialUpdate(int articleId, JsonPatchDocument<ArticlePostRequest> patchDocument, UserSessionModel user);
         Task<IEnumerable<CommentResponse>> GetCommentsOnArticle(int articleId);
         Task<CommentResponse> GetCommentOnArticle(int articleId, int commentId);
-        Task<ActionResult> DeleteCommentOnArticle(int articleId, UserSessionModel user , CommentDeleteRequest request);
-        Task<ActionResult> PostComment(int articleId, UserSessionModel user , CommentRequest request);
-
+        Task<ActionResult> DeleteCommentOnArticle(int articleId, UserSessionModel user, CommentDeleteRequest request);
+        Task<ActionResult> PostComment(int articleId, UserSessionModel user, CommentRequest request);
 
     }
 }

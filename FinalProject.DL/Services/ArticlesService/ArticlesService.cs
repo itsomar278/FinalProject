@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Services.ArticlesService;
 using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
 
-namespace FinalProject.DL.Services
+namespace Domain.Services.ArticlesService
 {
     public class ArticlesService : IArticleService
     {
@@ -22,9 +23,9 @@ namespace FinalProject.DL.Services
             _mapper = mapper;
         }
 
-        public async Task<ActionResult> ArticlePartialUpdate(int articleId, JsonPatchDocument<ArticlePostRequest> patchDocument , UserSessionModel user)
+        public async Task<ActionResult> ArticlePartialUpdate(int articleId, JsonPatchDocument<ArticlePostRequest> patchDocument, UserSessionModel user)
         {
-            if ( user is null )
+            if (user is null)
             {
                 throw new UnauthorizedUserException("you need to relogin");
             }
@@ -42,7 +43,7 @@ namespace FinalProject.DL.Services
 
             var articlePostRequest = _mapper.Map<ArticlePostRequest>(articleToUpdate);
             patchDocument.ApplyTo(articlePostRequest);
-            _mapper.Map<ArticlePostRequest, Articles>(articlePostRequest, articleToUpdate);
+            _mapper.Map<ArticlePostRequest,Articles>(articlePostRequest, articleToUpdate);
             _unitOfWork.complete();
 
             return await Task.FromResult(new OkResult());
@@ -66,7 +67,7 @@ namespace FinalProject.DL.Services
                 throw new UnauthorizedUserException("you cant delete this article ");
             }
 
-           var related = _unitOfWork.Favorites.Find(f => f.ArticleId == articleId); // to avoid cycles and multi cascade pathes 
+            var related = _unitOfWork.Favorites.Find(f => f.ArticleId == articleId); // to avoid cycles and multi cascade pathes 
             _unitOfWork.Favorites.RemoveRange(related);
             _unitOfWork.complete();
 
@@ -76,9 +77,9 @@ namespace FinalProject.DL.Services
             return await Task.FromResult(new OkResult());
         }
 
-        public async Task<ActionResult> DeleteCommentOnArticle(int articleId, UserSessionModel user , CommentDeleteRequest request)
+        public async Task<ActionResult> DeleteCommentOnArticle(int articleId, UserSessionModel user, CommentDeleteRequest request)
         {
-            if(user is null)
+            if (user is null)
             {
                 throw new UnauthorizedUserException("you need to re-login");
             }
@@ -90,7 +91,7 @@ namespace FinalProject.DL.Services
 
             if (!_unitOfWork.Comments.DoesExist(c => c.CommentId == request.commentId))
             {
-                throw new  RecordNotFoundException("there is no comment with the specified id");
+                throw new RecordNotFoundException("there is no comment with the specified id");
             }
 
             var comment = _unitOfWork.Comments.Get(request.commentId);
@@ -98,7 +99,7 @@ namespace FinalProject.DL.Services
             {
                 throw new UnauthorizedUserException("you cant delete another user comment");
             }
-  
+
             _unitOfWork.Comments.Remove(comment);
             _unitOfWork.complete();
 
@@ -156,7 +157,7 @@ namespace FinalProject.DL.Services
             var user = _unitOfWork.Users.Get(comment.UserId);
             var response = _mapper.Map<CommentResponse>((comment, user));
 
-            return response;
+            return  response;
         }
 
         public async Task<IEnumerable<CommentResponse>> GetCommentsOnArticle(int articleId)
@@ -199,11 +200,11 @@ namespace FinalProject.DL.Services
 
         public async Task<ActionResult> PostComment(int articleId, UserSessionModel user, CommentRequest request)
         {
-            if(user is null)
+            if (user is null)
             {
                 throw new UnauthorizedUserException("you need to re-login");
             }
-            if (!_unitOfWork.Articles.DoesExist(a=> a.ArticleId == articleId))
+            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
             {
                 throw new RecordNotFoundException("specified article cannot be found");
             }

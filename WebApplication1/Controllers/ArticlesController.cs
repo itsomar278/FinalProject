@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using FinalProject.DL.Services;
+using Domain.Services.ArticlesService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -15,20 +15,15 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class ArticlesController : ControllerBase
     {
-        private readonly IUnitOfWork _unitOfWork;
         private readonly ISessionDataManagment _sessionDataManagment;
-        private readonly IMapper _mapper;
         private readonly IArticleService _articleService;
         const int maxArticlesPageSize = 5;
-        public ArticlesController(IUnitOfWork unitOfWork, ISessionDataManagment sessionDataManagment,
-            IMapper mapper, IArticleService articleService)
+        public ArticlesController( ISessionDataManagment sessionDataManagment, IArticleService articleService)
         {
-            _unitOfWork = unitOfWork;
             _sessionDataManagment = sessionDataManagment;
-            _mapper = mapper;
-            _articleService =
             _articleService = articleService;
         }
+
         [HttpPost, Authorize]
         public async Task<ActionResult> PostArticle(ArticlePostRequest request)
         {

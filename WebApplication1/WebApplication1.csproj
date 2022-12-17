@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FinalProject.DA\FinalProject.DAL.csproj" />
-    <ProjectReference Include="..\FinalProject.DL\FinalProject.DL.csproj" />
+    <ProjectReference Include="..\FinalProject.DA\DataAcess.csproj" />
+    <ProjectReference Include="..\FinalProject.DL\Domain.csproj" />
   </ItemGroup>
 
 </Project>

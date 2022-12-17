@@ -5,9 +5,9 @@ VisualStudioVersion = 17.4.33110.190
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication1", "WebApplication1.csproj", "{71F664E4-48F0-4765-AF54-7B6D90843C1E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinalProject.DAL", "..\FinalProject.DA\FinalProject.DAL.csproj", "{84224FFB-CF33-4888-B66A-84D630FB8304}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAcess", "..\FinalProject.DA\DataAcess.csproj", "{84224FFB-CF33-4888-B66A-84D630FB8304}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinalProject.DL", "..\FinalProject.DL\FinalProject.DL.csproj", "{E60F266C-C9DC-4C51-A6E9-F6BB751C8FA4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Domain", "..\FinalProject.DL\Domain.csproj", "{E60F266C-C9DC-4C51-A6E9-F6BB751C8FA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

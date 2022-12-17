@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Services.SessionManagment;
@@ -9,9 +11,13 @@ namespace WebApplication1.Services.SessionDataManagment
     public class SessionDataManagment : ISessionDataManagment
     {
         private readonly IHttpContextAccessor _httpContextAccessor ;
-        public SessionDataManagment(IHttpContextAccessor httpContextAccessor)
+        private readonly IMapper _mapper ;
+        private readonly IUnitOfWork _unitOfWork;
+        public SessionDataManagment(IHttpContextAccessor httpContextAccessor , IMapper mapper , IUnitOfWork unitOfWork )
         {
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
         public UserSessionModel GetUserFromSession()
         {
@@ -25,9 +31,11 @@ namespace WebApplication1.Services.SessionDataManagment
                 return null;
             }
         }
-        public void StoreUserInSession(UserSessionModel user)
+        public void StoreUserInSession(string userEmail)
         {
-            string userJson = JsonConvert.SerializeObject(user);
+            var userResult = _unitOfWork.Users.FindByEmail(userEmail);
+            var userInSession = _mapper.Map<UserSessionModel>(userResult);
+            string userJson = JsonConvert.SerializeObject(userInSession);
             _httpContextAccessor.HttpContext.Session.SetString("MyUser", userJson);
         }
     }

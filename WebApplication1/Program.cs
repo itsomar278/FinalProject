@@ -1,11 +1,11 @@
+
+using Domain.Services;
+using Domain.Services.ArticlesService;
 using FinalProject.DL;
-using FinalProject.DL.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.VisualBasic;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
 using WebApplication1.DataAccess;
@@ -55,6 +55,7 @@ namespace WebApplication1
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddScoped<IAuthinticateService , AuthenticationService>();
             builder.Services.AddScoped<IArticleService , ArticlesService>();
+            builder.Services.AddScoped<IUserService ,UsersService>();
             builder.Services.AddSession(options =>
             {
                 options.IdleTimeout = TimeSpan.FromHours(1);
@@ -106,7 +107,9 @@ namespace WebApplication1
                 app.UseSwaggerUI();
             }
             app.UseSession();
+
             app.UseCookiePolicy();
+
             app.UseHttpsRedirection();
 
             app.UseAuthentication();
