@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Expressions;
 using WebApplication1.Models.Entites;
 
@@ -13,14 +14,14 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
         {
             get { return _DbContext as ProjectDbContext; }
         }
-        public Users FindByEmail(string email)
+        public async Task<Users> FindByEmailAsync(string email)
         {
-            var user = _DbContext.Set<Users>().SingleOrDefault(user => user.UserEmail == email);
+            var user = await _DbContext.Set<Users>().SingleOrDefaultAsync(user => user.UserEmail == email);
             return user;
         }
-        public void UpdateUserRefreshToken(int userId ,int refreshTokenId)
+        public async void UpdateUserRefreshToken(int userId ,int refreshTokenId)
         {
-            var user = Get(userId);
+            var user = await GetAsync(userId);
             if (refreshTokenId == 0)
             {
                 user.RefreshTokenId = null;
@@ -30,16 +31,16 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
                 user.RefreshTokenId = refreshTokenId;
             }
         }
-        public IEnumerable<Users> GetUsers(string? searchQuery, int pageNumber, int pageSize)
+        public async Task<IEnumerable<Users>> GetUsersAsync(string? searchQuery, int pageNumber, int pageSize)
         {
             if (string.IsNullOrEmpty(searchQuery))
             {
-                var users = GetAll().OrderBy(u => u.UserName).Skip(pageSize * (pageNumber - 1)).Take(pageSize); 
+                var users = (await GetAllAsync()).OrderBy(u => u.UserName).Skip(pageSize * (pageNumber - 1)).Take(pageSize); 
                 return users;
             } 
             else
             {
-                var users = Find(u=>u.UserName.Contains(searchQuery)).OrderBy(u => u.UserName).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
+                var users = (await FindAsync(u=>u.UserName.Contains(searchQuery))).OrderBy(u => u.UserName).Skip(pageSize * (pageNumber - 1)).Take(pageSize);
                 return users;
             }
         }

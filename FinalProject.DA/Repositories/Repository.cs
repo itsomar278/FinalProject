@@ -10,30 +10,30 @@ namespace WebApplication1.DataAccess.Repositories
         {
             _DbContext = dbContext;
         }
-        public void Add(TEntity entity)
+        public void AddAsync(TEntity entity)
         {
-            _DbContext.Add(entity);
+            _DbContext.AddAsync(entity);
         }
-        public void AddRange(IEnumerable<TEntity> entities)
+        public void AddRangeAsync(IEnumerable<TEntity> entities)
         {
-            _DbContext.AddRange(entities);
+            _DbContext.AddRangeAsync(entities);
         }
-        public IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate)
+        public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return _DbContext.Set<TEntity>().Where(predicate);
+            return await _DbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
-        public virtual TEntity Get((int, int) id )
+        public virtual async Task<TEntity> GetAsync((int, int) id )
         {
-            return _DbContext.Set<TEntity>().Find(id.Item1 , id.Item2);
+            return await _DbContext.Set<TEntity>().FindAsync(id.Item1 , id.Item2);
         }
-        public virtual TEntity Get(int id)
+        public virtual async Task<TEntity> GetAsync(int id)
         {
-            return _DbContext.Set<TEntity>().Find(id);
+            return await _DbContext.Set<TEntity>().FindAsync(id);
         }
 
-        public IEnumerable<TEntity> GetAll()
+        public async Task<IEnumerable<TEntity>> GetAllAsync()
         {
-            return _DbContext.Set<TEntity>().ToList();
+            return await _DbContext.Set<TEntity>().ToListAsync();
         }
         public void Remove(TEntity entity)
         {
@@ -43,9 +43,9 @@ namespace WebApplication1.DataAccess.Repositories
         {
             _DbContext.Set<TEntity>().RemoveRange(entities);
         }
-        public bool DoesExist(Expression<Func<TEntity, bool>> predicate)
+        public async Task<bool> DoesExistAsync(Expression<Func<TEntity, bool>> predicate)
         {
-            return _DbContext.Set<TEntity>().Any(predicate);
+            return await _DbContext.Set<TEntity>().AnyAsync(predicate);
         }
     }
 }

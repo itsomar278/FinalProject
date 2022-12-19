@@ -30,12 +30,12 @@ namespace Domain.Services.ArticlesService
                 throw new UnauthorizedUserException("you need to relogin");
             }
 
-            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId)))
             {
                 throw new RecordNotFoundException("cannot find the specifed article");
             }
 
-            var articleToUpdate = _unitOfWork.Articles.Get(articleId);
+            var articleToUpdate = await _unitOfWork.Articles.GetAsync(articleId);
             if (user.UserId != articleToUpdate.UserId)
             {
                 throw new UnauthorizedUserException("you cant upadte other users articles");
@@ -44,7 +44,7 @@ namespace Domain.Services.ArticlesService
             var articlePostRequest = _mapper.Map<ArticlePostRequest>(articleToUpdate);
             patchDocument.ApplyTo(articlePostRequest);
             _mapper.Map<ArticlePostRequest,Articles>(articlePostRequest, articleToUpdate);
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
 
             return await Task.FromResult(new OkResult());
         }
@@ -56,23 +56,23 @@ namespace Domain.Services.ArticlesService
                 throw new UnauthorizedUserException("you need to relogin");
             }
 
-            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId)))
             {
                 throw new RecordNotFoundException("cannot find the specifed article");
             }
 
-            var article = _unitOfWork.Articles.Get(articleId);
+            var article = await _unitOfWork.Articles.GetAsync(articleId);
             if (article.UserId != user.UserId)
             {
                 throw new UnauthorizedUserException("you cant delete this article ");
             }
 
-            var related = _unitOfWork.Favorites.Find(f => f.ArticleId == articleId); // to avoid cycles and multi cascade pathes 
+            var related =await _unitOfWork.Favorites.FindAsync(f => f.ArticleId == articleId); // to avoid cycles and multi cascade pathes 
             _unitOfWork.Favorites.RemoveRange(related);
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
 
             _unitOfWork.Articles.Remove(article);
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
 
             return await Task.FromResult(new OkResult());
         }
@@ -84,37 +84,37 @@ namespace Domain.Services.ArticlesService
                 throw new UnauthorizedUserException("you need to re-login");
             }
 
-            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId)))
             {
                 throw new RecordNotFoundException("there is no article with the specified id");
             }
 
-            if (!_unitOfWork.Comments.DoesExist(c => c.CommentId == request.commentId))
+            if (!(await _unitOfWork.Comments.DoesExistAsync(c => c.CommentId == request.commentId)))
             {
                 throw new RecordNotFoundException("there is no comment with the specified id");
             }
 
-            var comment = _unitOfWork.Comments.Get(request.commentId);
+            var comment = await _unitOfWork.Comments.GetAsync(request.commentId);
             if (user.UserId != comment.UserId)
             {
                 throw new UnauthorizedUserException("you cant delete another user comment");
             }
 
             _unitOfWork.Comments.Remove(comment);
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
 
             return await Task.FromResult(new OkResult());
         }
 
         public async Task<ArticleResponse> GetArticle(int articleId)
         {
-            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId)))
             {
                 throw new RecordNotFoundException("cannot find the specifed article");
             }
 
-            var article = _unitOfWork.Articles.Get(articleId);
-            var user = _unitOfWork.Users.Get(article.UserId);
+            var article = await _unitOfWork.Articles.GetAsync(articleId);
+            var user = await _unitOfWork.Users.GetAsync(article.UserId);
             var response = _mapper.Map<ArticleResponse>((article, user));
 
             return await Task.FromResult(response);
@@ -123,7 +123,7 @@ namespace Domain.Services.ArticlesService
 
         public async Task<IEnumerable<ArticleResponse>> GetArticles(string? title, string? searchQuery, int pageNumber, int pageSize)
         {
-            var articles = _unitOfWork.Articles.GetArticles(title, searchQuery, pageNumber, pageSize);
+            var articles = await _unitOfWork.Articles.GetArticlesAsync(title, searchQuery, pageNumber, pageSize);
 
             if (articles.Count() == 0)
             {
@@ -133,7 +133,7 @@ namespace Domain.Services.ArticlesService
             List<ArticleResponse> articleResponses = new List<ArticleResponse>();
             foreach (var article in articles)
             {
-                var user = _unitOfWork.Users.Get(article.UserId);
+                var user = await _unitOfWork.Users.GetAsync(article.UserId);
                 var response = _mapper.Map<ArticleResponse>((article, user));
                 articleResponses.Add(response);
             }
@@ -143,18 +143,18 @@ namespace Domain.Services.ArticlesService
 
         public async Task<CommentResponse> GetCommentOnArticle(int articleId, int commentId)
         {
-            if (!_unitOfWork.Articles.DoesExist(A => A.ArticleId == articleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(A => A.ArticleId == articleId)))
             {
                 throw new RecordNotFoundException("specified article cannot be found");
             }
 
-            if (!_unitOfWork.Comments.DoesExist(C => C.CommentId == commentId))
+            if (!(await _unitOfWork.Comments.DoesExistAsync(C => C.CommentId == commentId)))
             {
                 throw new RecordNotFoundException("specified comment cannot be found");
             }
 
-            var comment = _unitOfWork.Comments.Get(commentId);
-            var user = _unitOfWork.Users.Get(comment.UserId);
+            var comment = await _unitOfWork.Comments.GetAsync(commentId);
+            var user = await _unitOfWork.Users.GetAsync(comment.UserId);
             var response = _mapper.Map<CommentResponse>((comment, user));
 
             return  response;
@@ -162,12 +162,12 @@ namespace Domain.Services.ArticlesService
 
         public async Task<IEnumerable<CommentResponse>> GetCommentsOnArticle(int articleId)
         {
-            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId)))
             {
                 throw new RecordNotFoundException("specified article cannot be found");
             }
 
-            var comments = _unitOfWork.Comments.Find(c => c.ArticleId == articleId);
+            var comments = await _unitOfWork.Comments.FindAsync(c => c.ArticleId == articleId);
             if (comments.Count() == 0)
             {
                 return Enumerable.Empty<CommentResponse>();
@@ -176,7 +176,7 @@ namespace Domain.Services.ArticlesService
             List<CommentResponse> responses = new List<CommentResponse>();
             foreach (var comment in comments)
             {
-                var user = _unitOfWork.Users.Get(comment.UserId);
+                var user = await _unitOfWork.Users.GetAsync(comment.UserId);
                 var commentResponse = _mapper.Map<CommentResponse>((comment, user));
                 responses.Add(commentResponse);
             }
@@ -192,8 +192,8 @@ namespace Domain.Services.ArticlesService
             }
 
             var article = _mapper.Map<Articles>((request, userFromSession));
-            _unitOfWork.Articles.Add(article);
-            _unitOfWork.complete();
+            _unitOfWork.Articles.AddAsync(article);
+            await _unitOfWork.complete();
 
             return await Task.FromResult<ActionResult>(new OkResult());
         }
@@ -204,7 +204,7 @@ namespace Domain.Services.ArticlesService
             {
                 throw new UnauthorizedUserException("you need to re-login");
             }
-            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == articleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId)))
             {
                 throw new RecordNotFoundException("specified article cannot be found");
             }
@@ -215,8 +215,8 @@ namespace Domain.Services.ArticlesService
                 ArticleId = articleId,
                 UserId = user.UserId
             };
-            _unitOfWork.Comments.Add(comment);
-            _unitOfWork.complete();
+            _unitOfWork.Comments.AddAsync(comment);
+            await _unitOfWork.complete();
 
             return await Task.FromResult(new OkResult());
         }

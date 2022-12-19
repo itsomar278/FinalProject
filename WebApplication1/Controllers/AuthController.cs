@@ -15,10 +15,12 @@ namespace WebApplication1.Controllers
     {
         private readonly IAuthinticateService _authinticateService;
         private readonly ISessionDataManagment _sessionDataManagment;
-        public AuthController( IAuthinticateService authinticateService, ISessionDataManagment sessionDataManagment)
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public AuthController( IAuthinticateService authinticateService, ISessionDataManagment sessionDataManagment , IHttpContextAccessor httpContextAccessor)
         {
             _authinticateService = authinticateService;
             _sessionDataManagment = sessionDataManagment;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         [HttpPost("register")]
@@ -33,7 +35,7 @@ namespace WebApplication1.Controllers
         {
             var token = await _authinticateService.login(request);
 
-            var refreshToken = _authinticateService.GenerateRefreshToken(request.UserEmail);
+            var refreshToken = await _authinticateService.GenerateRefreshToken(request.UserEmail);
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -41,9 +43,9 @@ namespace WebApplication1.Controllers
             };
             Response.Cookies.Append("refreshToken", refreshToken.Token, cookieOptions);
 
-            _authinticateService.UpdateUserRefreshToken(request.UserEmail, refreshToken);
+            await _authinticateService.UpdateUserRefreshToken(request.UserEmail, refreshToken);
 
-            _sessionDataManagment.StoreUserInSession(request.UserEmail);
+            await _sessionDataManagment.StoreUserInSession(request.UserEmail);
 
             return Ok(token);
         }
@@ -59,15 +61,15 @@ namespace WebApplication1.Controllers
                     Response.Cookies.Delete(cookie);
             }
             string token = await _authinticateService.RefreshToken(sessionUser, refreshToken);
-            var newRefreshToken = _authinticateService.GenerateRefreshToken(sessionUser.UserEmail);
-            _authinticateService.UpdateUserRefreshToken(sessionUser.UserEmail, newRefreshToken);
+            var newRefreshToken = await _authinticateService.GenerateRefreshToken(sessionUser.UserEmail);
+            await _authinticateService.UpdateUserRefreshToken(sessionUser.UserEmail, newRefreshToken);
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
                 Expires = newRefreshToken.Expires
             };
             Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
-            _sessionDataManagment.StoreUserInSession(sessionUser.UserEmail);
+            await _sessionDataManagment.StoreUserInSession(sessionUser.UserEmail);
             return Ok(token);
         }
 

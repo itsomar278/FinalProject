@@ -7,7 +7,7 @@ using WebApplication1.DataAccess.Repositories.UsersRepository;
 
 namespace WebApplication1.DataAccess.UnitOfWorks
 {
-    public interface IUnitOfWork : IDisposable
+    public interface IUnitOfWork : IAsyncDisposable
     {
         IFollowRepository Follows { get; }
         IArticleRepository Articles { get; }
@@ -15,6 +15,6 @@ namespace WebApplication1.DataAccess.UnitOfWorks
         IUsersRepository Users { get; }
         IRefreshTokenRepository RefreshTokens { get; }
         IFavouriteRepository Favorites { get; }
-        int complete();
+        Task<int> complete();
     }
 }

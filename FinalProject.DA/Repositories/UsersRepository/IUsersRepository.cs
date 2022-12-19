@@ -6,8 +6,8 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
 {
     public interface IUsersRepository : IRepository<Users>
     {
-        public Users FindByEmail(string email);
+        public Task<Users> FindByEmailAsync(string email);
         public void UpdateUserRefreshToken(int userId, int refreshTokenId);
-        public IEnumerable<Users> GetUsers(string? searchQuery, int pageNumber, int pageSize);
+        public Task<IEnumerable<Users>> GetUsersAsync(string? searchQuery, int pageNumber, int pageSize);
     }
 }

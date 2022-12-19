@@ -2,7 +2,6 @@
 using Domain.Exceptions;
 using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -51,17 +50,17 @@ namespace WebApplication1.Services.Authentication
             var jwt = new JwtSecurityTokenHandler().WriteToken(token);
             return jwt;
         }
-        public bool VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
+        public async Task<bool> VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt)
         {
             using (var hmac = new HMACSHA512(passwordSalt))
             {
                 var computedHash = hmac.ComputeHash(System.Text.Encoding.UTF8.GetBytes(password));
-                return computedHash.SequenceEqual(passwordHash);
+                return await Task.FromResult(computedHash.SequenceEqual(passwordHash));
             }
         }
-        public RefreshTokens GenerateRefreshToken(string email)
+        public async Task<RefreshTokens> GenerateRefreshToken(string email)
         {
-            var user = _unitOfWork.Users.FindByEmail(email);
+            var user = await _unitOfWork.Users.FindByEmailAsync(email);
             var refreshToken = new RefreshTokens
             {
                 Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
@@ -70,40 +69,40 @@ namespace WebApplication1.Services.Authentication
                 UserId = user.UserId
             };
 
-            return refreshToken;
+            return await Task.FromResult(refreshToken);
         }
         public async Task<ActionResult> Register(UserRegisterRequest request)
         {
-            if (_unitOfWork.Users.DoesExist(u => u.UserEmail == request.UserEmail) ||
-                _unitOfWork.Users.DoesExist(u => u.UserName == request.UserName))
+            if ((await _unitOfWork.Users.DoesExistAsync(u => u.UserEmail == request.UserEmail)) ||
+                (await _unitOfWork.Users.DoesExistAsync(u => u.UserName == request.UserName)))
             {
                 throw new AlreadyExistingRecordException("Email or User Name has been used before"); // some sort of problem is here 
             }
 
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
             var user = _mapper.Map<Users>((request, passwordHash, passwordSalt));
-            _unitOfWork.Users.Add(user);
-            _unitOfWork.complete();
+            _unitOfWork.Users.AddAsync(user);
+            await _unitOfWork.complete();
             return await Task.FromResult(new OkResult());
         }
         public async Task<string> login(UserLoginRequest request)
         {
-            if (!_unitOfWork.Users.DoesExist(u => u.UserEmail == request.UserEmail))
+            if (!(await _unitOfWork.Users.DoesExistAsync(u => u.UserEmail == request.UserEmail)))
             {
                 throw new RecordNotFoundException("There is no user with such email address");
             }
 
-            var userResult = _unitOfWork.Users.FindByEmail(request.UserEmail);
-            if (!VerifyPasswordHash(request.Password, userResult.PasswordHash, userResult.PasswordSalt))
+            var userResult = await _unitOfWork.Users.FindByEmailAsync(request.UserEmail);
+            if (!(await VerifyPasswordHash(request.Password, userResult.PasswordHash, userResult.PasswordSalt)))
             {
                 throw new UnauthorizedUserException("wrong passowrd !!!!!");
             }
 
-            var refreshTokenResult = _unitOfWork.RefreshTokens.Find(t => t.UserId == userResult.UserId);
+            var refreshTokenResult = await _unitOfWork.RefreshTokens.FindAsync(t => t.UserId == userResult.UserId);
             if (refreshTokenResult.Count() != 0)
             {
                 _unitOfWork.RefreshTokens.RemoveRange(refreshTokenResult);
-                _unitOfWork.complete();
+                await _unitOfWork.complete();
             }
 
             var token = CreateToken(userResult);
@@ -111,34 +110,34 @@ namespace WebApplication1.Services.Authentication
         }
         public async Task<string> RefreshToken(UserSessionModel sessionUser, string refreshToken)
         {
-            if (string.IsNullOrEmpty(refreshToken)  || sessionUser is null)
+            if (string.IsNullOrEmpty(refreshToken) || sessionUser is null)
             {
                 throw new UnauthorizedUserException("you need to re-login");
             }
 
-            var myRefreshToken = _unitOfWork.RefreshTokens.Get((sessionUser.RefreshTokenId));
+            var myRefreshToken = await _unitOfWork.RefreshTokens.GetAsync(sessionUser.RefreshTokenId);
             if (myRefreshToken.Token != refreshToken || myRefreshToken.Expires < DateTime.Now)
             {
 
                 throw new UnauthorizedUserException("you need to re-login");
             }
 
-            var user = _unitOfWork.Users.Get(sessionUser.UserId);
+            var user = await _unitOfWork.Users.GetAsync(sessionUser.UserId);
             string token = CreateToken(user);
             return await Task.FromResult(token);
         }
         public async Task<ActionResult> logout(UserSessionModel user)
         {
-            if(user == null)
-            throw new UnauthorizedUserException("you are not logged in in the first place");
+            if (user == null)
+                throw new UnauthorizedUserException("you are not logged in in the first place");
 
-            if (_unitOfWork.RefreshTokens.DoesExist(rt => rt.UserId == user.UserId))
+            if (await _unitOfWork.RefreshTokens.DoesExistAsync(rt => rt.UserId == user.UserId))
                 DeleteUserRefreshToken(user.UserEmail);
-             return await Task.FromResult(new OkResult());
+            return await Task.FromResult(new OkResult());
         }
-        public async Task<ActionResult> UpdatePassword(UserPasswordUpdateRequest request , UserSessionModel sessionUser)
+        public async Task<ActionResult> UpdatePassword(UserPasswordUpdateRequest request, UserSessionModel sessionUser)
         {
-            var user = _unitOfWork.Users.FindByEmail(request.UserEmail);
+            var user = await _unitOfWork.Users.FindByEmailAsync(request.UserEmail);
             if (user == null)
             {
                 throw new RecordNotFoundException("There is no user with such email address");
@@ -151,21 +150,21 @@ namespace WebApplication1.Services.Authentication
             {
                 throw new RecordNotFoundException("you cant change other user passwword");
             }
-            if (!VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt))
+            if (!(await VerifyPasswordHash(request.OldPassword, user.PasswordHash, user.PasswordSalt)))
             {
                 throw new UnauthorizedUserException("Incorrect old password");
             }
-           CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
+            CreatePasswordHash(request.NewPassword, out byte[] passwordHash, out byte[] passwordSalt);
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
             return await Task.FromResult(new OkResult());
         }
         public async Task<ActionResult> UpdateUserName(UpdateUserNameRequest request, UserSessionModel sessionUser)
         {
-            var user = _unitOfWork.Users.FindByEmail(request.UserEmail);
+            var user = await _unitOfWork.Users.FindByEmailAsync(request.UserEmail);
             if (user == null)
-                throw new  RecordNotFoundException("There is no user with such email address");
+                throw new RecordNotFoundException("There is no user with such email address");
 
 
             if (sessionUser == null)
@@ -175,38 +174,38 @@ namespace WebApplication1.Services.Authentication
             if (user.UserId != sessionUser.UserId)
                 throw new UnauthorizedUserException("you cant change someone else password");
 
-            if (!VerifyPasswordHash(request.userPassword, user.PasswordHash, user.PasswordSalt))
+            if (!(await VerifyPasswordHash(request.userPassword, user.PasswordHash, user.PasswordSalt)))
                 throw new UnauthorizedUserException("Incorrect password");
 
             user.UserName = request.NewUserName;
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
             return await Task.FromResult(new OkResult());
         }
-        public async void UpdateUserRefreshToken(string userEmail, RefreshTokens refreshToken)
+        public async Task UpdateUserRefreshToken(string userEmail, RefreshTokens refreshToken)
         {
-            var userResult = _unitOfWork.Users.FindByEmail(userEmail);
-            if(_unitOfWork.RefreshTokens.DoesExist(rt => rt.UserId == userResult.UserId))
+            var userResult = await _unitOfWork.Users.FindByEmailAsync(userEmail);
+            if (await _unitOfWork.RefreshTokens.DoesExistAsync(rt => rt.UserId == userResult.UserId))
             {
-               var refreshTokenToDelete =  _unitOfWork.RefreshTokens.Find(rt => rt.UserId == userResult.UserId);
+                var refreshTokenToDelete = await _unitOfWork.RefreshTokens.FindAsync(rt => rt.UserId == userResult.UserId);
                 _unitOfWork.RefreshTokens.RemoveRange(refreshTokenToDelete);
-                _unitOfWork.complete();
+                await _unitOfWork.complete();
             }
-            _unitOfWork.RefreshTokens.Add(refreshToken);
-            _unitOfWork.complete();
+            _unitOfWork.RefreshTokens.AddAsync(refreshToken);
+            await _unitOfWork.complete();
             _unitOfWork.Users.UpdateUserRefreshToken(userResult.UserId, refreshToken.TokenId);
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
         }
-        public async void DeleteUserRefreshToken (string userEmail)
+        public async Task DeleteUserRefreshToken(string userEmail)
         {
-            var userResult = _unitOfWork.Users.FindByEmail(userEmail);
-            if (_unitOfWork.RefreshTokens.DoesExist(rt => rt.UserId == userResult.UserId))
+            var userResult = await _unitOfWork.Users.FindByEmailAsync(userEmail);
+            if (await _unitOfWork.RefreshTokens.DoesExistAsync(rt => rt.UserId == userResult.UserId))
             {
-                var refreshTokenToDelete = _unitOfWork.RefreshTokens.Find(rt => rt.UserId == userResult.UserId);
+                var refreshTokenToDelete = await _unitOfWork.RefreshTokens.FindAsync(rt => rt.UserId == userResult.UserId);
                 _unitOfWork.RefreshTokens.RemoveRange(refreshTokenToDelete);
-                _unitOfWork.complete();
+                await _unitOfWork.complete();
             }
-            _unitOfWork.Users.UpdateUserRefreshToken(userResult.UserId,0);
-            _unitOfWork.complete();
+            _unitOfWork.Users.UpdateUserRefreshToken(userResult.UserId, 0);
+            await _unitOfWork.complete();
         }
 
     }

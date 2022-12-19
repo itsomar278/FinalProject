@@ -6,7 +6,7 @@ namespace WebApplication1.Services.SessionManagment
 {
     public interface ISessionDataManagment
     {
-        void StoreUserInSession(string userEmail);
+        Task StoreUserInSession(string userEmail);
         UserSessionModel GetUserFromSession();
     }
 }

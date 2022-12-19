@@ -1,5 +1,4 @@
-﻿using WebApplication1.DataAccess;
-using WebApplication1.DataAccess.Repositories.ArticleRepository;
+﻿using WebApplication1.DataAccess.Repositories.ArticleRepository;
 using WebApplication1.DataAccess.Repositories.CommentRepository;
 using WebApplication1.DataAccess.Repositories.FavoriteRepository;
 using WebApplication1.DataAccess.Repositories.FollowRepository;
@@ -29,13 +28,14 @@ namespace WebApplication1.DataAccess.UnitOfWorks
         public IUsersRepository Users { get; private set; }
         public IRefreshTokenRepository RefreshTokens { get; private set; }
         public IFavouriteRepository Favorites { get; private set; }
-        public int complete()
+        public async Task<int> complete()
         {
-            return _projectDbContext.SaveChanges();
+            return await _projectDbContext.SaveChangesAsync();
         }
-        public void Dispose()
+
+        public async ValueTask DisposeAsync()
         {
-            _projectDbContext.Dispose();
+            await _projectDbContext.DisposeAsync();
         }
     }
 }

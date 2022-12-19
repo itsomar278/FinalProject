@@ -31,9 +31,9 @@ namespace WebApplication1.Services.SessionDataManagment
                 return null;
             }
         }
-        public void StoreUserInSession(string userEmail)
+        public async Task StoreUserInSession(string userEmail)
         {
-            var userResult = _unitOfWork.Users.FindByEmail(userEmail);
+            var userResult = await _unitOfWork.Users.FindByEmailAsync(userEmail);
             var userInSession = _mapper.Map<UserSessionModel>(userResult);
             string userJson = JsonConvert.SerializeObject(userInSession);
             _httpContextAccessor.HttpContext.Session.SetString("MyUser", userJson);

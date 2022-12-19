@@ -4,14 +4,14 @@ namespace WebApplication1.DataAccess.Repositories
 {
     public interface IRepository<TEntity> where TEntity : class
     {
-        TEntity Get((int, int) id);
-        TEntity Get(int id);
-        IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
-        IEnumerable<TEntity> GetAll();
-        void Add(TEntity entity);
-        void AddRange(IEnumerable<TEntity> entities);
+        Task<TEntity> GetAsync((int, int) id);
+        Task<TEntity> GetAsync(int id);
+        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<IEnumerable<TEntity>> GetAllAsync();
+        void AddAsync(TEntity entity);
+        void AddRangeAsync(IEnumerable<TEntity> entities);
         void Remove(TEntity entity);
         void RemoveRange(IEnumerable<TEntity> entities);
-        bool DoesExist(Expression<Func<TEntity, bool>> predicate);
+        Task<bool> DoesExistAsync(Expression<Func<TEntity, bool>> predicate);
     }
 }

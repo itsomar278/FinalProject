@@ -22,23 +22,23 @@ namespace Domain.Services
 
         public async Task<IEnumerable<UsersResponse>> GetUsers(string? searchQuery, int pageNumber = 1, int pageSize = 3)
         {
-            var users = _unitOfWork.Users.GetUsers(searchQuery, pageNumber, pageSize);
+            var users = await _unitOfWork.Users.GetUsersAsync(searchQuery, pageNumber, pageSize);
             var usersResponses = _mapper.Map<List<UsersResponse>>(users);
             return await Task.FromResult(usersResponses);
         }
         public async Task<UsersResponse> GetUser(int userId)
         {
-            if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
+            if (!(await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId)))
             {
                 throw new  RecordNotFoundException("cannot find the specified user");
             }
-            var user = _unitOfWork.Users.Get(userId);
+            var user = await _unitOfWork.Users.GetAsync(userId);
             var userResponse = _mapper.Map<UsersResponse>(user);
             return await Task.FromResult(userResponse);
         }
         public async Task<IEnumerable<UsersResponse>> GetFollowers(int userId)
         {
-            if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
+            if (!(await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId)))
             {
                 throw new RecordNotFoundException("cannot find the specified user");
             }
@@ -46,7 +46,7 @@ namespace Domain.Services
             List<UsersResponse> usersResponses = new List<UsersResponse>();
             foreach (int id in followersId)
             {
-                var follower = _unitOfWork.Users.Get(id);
+                var follower = await _unitOfWork.Users.GetAsync(id);
                 var response = _mapper.Map<UsersResponse>(follower);
                 usersResponses.Add(response);
             }
@@ -54,7 +54,7 @@ namespace Domain.Services
         }
         public async Task<IEnumerable<UsersResponse>> GetFollowing(int userId)
         {
-            if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
+            if (!(await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId)))
             {
                 throw new RecordNotFoundException("cannot find the specified user");
             }
@@ -62,7 +62,7 @@ namespace Domain.Services
             List<UsersResponse> usersResponses = new List<UsersResponse>();
             foreach (int id in followingId)
             {
-                var followed = _unitOfWork.Users.Get(id);
+                var followed = await _unitOfWork.Users.GetAsync(id);
                 var response = _mapper.Map<UsersResponse>(followed);
                 usersResponses.Add(response);
             }
@@ -70,7 +70,7 @@ namespace Domain.Services
         }
         public async Task<ActionResult> Follow(int userId, FollowRequest followRequest, UserSessionModel sessionUser)
         {
-            if (!_unitOfWork.Users.DoesExist(u => u.UserId == userId))
+            if (!(await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId)))
             {
                 throw new RecordNotFoundException("cannot find the specified user");
             }
@@ -78,17 +78,17 @@ namespace Domain.Services
             {
                 throw new UnauthorizedUserException("Unauthorized");
             }
-            if (!_unitOfWork.Users.DoesExist(u => u.UserId == followRequest.UserToFollowId))
+            if (!(await _unitOfWork.Users.DoesExistAsync(u => u.UserId == followRequest.UserToFollowId)))
             {
                 throw new RecordNotFoundException("cant find a user to follow with such id");
             }
-            if (_unitOfWork.Follows.DoesExist(f => f.FollowerId == userId && f.FollowedId == followRequest.UserToFollowId))
+            if (await(_unitOfWork.Follows.DoesExistAsync(f => f.FollowerId == userId && f.FollowedId == followRequest.UserToFollowId)))
             {
                 throw new AlreadyExistingRecordException("you already follow this user");
             }
             var follow = _mapper.Map<Follow>((followRequest, userId));
-            _unitOfWork.Follows.Add(follow);
-            _unitOfWork.complete();
+            _unitOfWork.Follows.AddAsync(follow);
+            await _unitOfWork.complete();
             return await Task.FromResult(new OkResult());
         }
         public async Task<ActionResult> Unfollow(int userId, int UserToUnfollowId, UserSessionModel sessionUser)
@@ -102,13 +102,13 @@ namespace Domain.Services
                 throw new UnauthorizedUserException("Unauthorized action");
 
             }
-            if (!_unitOfWork.Follows.DoesExist(f => f.FollowerId == userId && f.FollowedId == UserToUnfollowId))
+            if (!(await _unitOfWork.Follows.DoesExistAsync(f => f.FollowerId == userId && f.FollowedId == UserToUnfollowId)))
             {
                 throw new RecordNotFoundException("you already not following that user");
             }
-            var follow = _unitOfWork.Follows.Get((userId, UserToUnfollowId));
+            var follow = await _unitOfWork.Follows.GetAsync((userId, UserToUnfollowId));
             _unitOfWork.Follows.Remove(follow);
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
             return await Task.FromResult(new OkResult());   
         }
         public async Task<ActionResult> RemoveFollower(int userId , int userToRemoveId , UserSessionModel sessionUser)
@@ -123,30 +123,30 @@ namespace Domain.Services
                 throw new UnauthorizedUserException("Unauthorized action");
             }
 
-            if (_unitOfWork.Follows.DoesExist(f => f.FollowedId == userId && f.FollowerId == userToRemoveId))
+            if (!(await _unitOfWork.Follows.DoesExistAsync(f => f.FollowedId == userId && f.FollowerId == userToRemoveId)))
             {
                 throw new RecordNotFoundException("this user already doesn't follow you ");
             }
 
-            var follow = _unitOfWork.Follows.Get((userToRemoveId, userId));
+            var follow = await _unitOfWork.Follows.GetAsync((userToRemoveId, userId));
             _unitOfWork.Follows.Remove(follow);
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
 
             return await Task.FromResult(new OkResult());
         }
         public async Task<IEnumerable<ArticleResponse>> GetFavoriteArticles(int userId, int pageNumber, int pageSize)
         {
-            var user = _unitOfWork.Users.Get(userId);
+            var user = await _unitOfWork.Users.GetAsync(userId);
             if (user == null)
             {
                 throw new RecordNotFoundException("cannot find the specifed user ");
             }
-            var favoriteArticles = _unitOfWork.Favorites.Find(f => f.UserId == userId);
+            var favoriteArticles = await _unitOfWork.Favorites.FindAsync(f => f.UserId == userId);
             List<ArticleResponse> articleResponses = new List<ArticleResponse>();
             foreach (var favorite in favoriteArticles.Skip(pageSize * (pageNumber - 1)).Take(pageSize))
             {
-                var article = _unitOfWork.Articles.Get(favorite.ArticleId);
-                var author = _unitOfWork.Users.Get(article.UserId);
+                var article = await _unitOfWork.Articles.GetAsync(favorite.ArticleId);
+                var author = await _unitOfWork.Users.GetAsync(article.UserId);
                 var articleResponse = _mapper.Map<ArticleResponse>((article, user));
                 articleResponses.Add(articleResponse);
             }
@@ -162,17 +162,17 @@ namespace Domain.Services
             {
                 throw new UnauthorizedUserException("Unauthorized action");
             }
-            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == request.ArticleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == request.ArticleId)))
             {
                 throw new RecordNotFoundException("cannot find an article with such id");
             }
-            if (_unitOfWork.Favorites.DoesExist(f => f.UserId == userId && f.ArticleId == request.ArticleId))
+            if (await _unitOfWork.Favorites.DoesExistAsync(f => f.UserId == userId && f.ArticleId == request.ArticleId))
             {
                 throw new AlreadyExistingRecordException("you already have this article in your favorites");
             }
             var favorite = _mapper.Map<Favorite>((request, userId));
-            _unitOfWork.Favorites.Add(favorite);
-            _unitOfWork.complete();
+            _unitOfWork.Favorites.AddAsync(favorite);
+            await _unitOfWork.complete();
             return await Task.FromResult(new OkResult());
         }
         public async Task<ActionResult> RemoveFromFavourites(int userId, RemoveFromFavouritesRequest request, UserSessionModel sessionUser)
@@ -185,17 +185,17 @@ namespace Domain.Services
             {
                 throw new UnauthorizedUserException("Unauthorized action");
             }
-            if (!_unitOfWork.Articles.DoesExist(a => a.ArticleId == request.ArticleId))
+            if (!(await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == request.ArticleId)))
             {
                 throw new RecordNotFoundException("cannot find an article with such id");
             }
-            if (!_unitOfWork.Favorites.DoesExist(f => f.UserId == userId && f.ArticleId == request.ArticleId))
+            if (!(await _unitOfWork.Favorites.DoesExistAsync(f => f.UserId == userId && f.ArticleId == request.ArticleId)))
             {
                 throw new RecordNotFoundException("there is no article with such id in your favorites");
             }
-            var favorite = _unitOfWork.Favorites.Get((request.ArticleId, userId));
+            var favorite =await _unitOfWork.Favorites.GetAsync((request.ArticleId, userId));
             _unitOfWork.Favorites.Remove(favorite);
-            _unitOfWork.complete();
+            await _unitOfWork.complete();
             return await Task.FromResult(new OkResult());
         }
     }

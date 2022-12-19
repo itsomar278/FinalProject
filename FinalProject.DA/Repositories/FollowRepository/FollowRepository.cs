@@ -19,7 +19,7 @@ namespace WebApplication1.DataAccess.Repositories.FollowRepository
                 FollowedId = userToFollowId,
                 FollowerId = userId
             };
-            Add(follow);
+            AddAsync(follow);
         }
         public List<int> GetAllFollowersId(int userId)
         {

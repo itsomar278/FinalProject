@@ -13,7 +13,7 @@ namespace WebApplication1.DataAccess.Repositories.FavoriteRepository
             get { return _DbContext as ProjectDbContext; }
         }
         override
-           public Favorite Get(int id)
+           public Task<Favorite> GetAsync(int id)
         {
             throw new ArgumentException("unsupported opearation");
         }
