@@ -22,14 +22,14 @@ namespace WebApplication1.Services.SessionDataManagment
         public UserSessionModel GetUserFromSession()
         {
             string userJson = _httpContextAccessor.HttpContext.Session.GetString("MyUser");
+
             if (userJson != null)
             {
                 return JsonConvert.DeserializeObject<UserSessionModel>(userJson);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
+            
         }
         public async Task StoreUserInSession(string userEmail)
         {

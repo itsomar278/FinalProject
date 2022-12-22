@@ -31,6 +31,7 @@ namespace WebApplication1.Controllers
                 pageSize = maxUsersPageSize;
 
             var users = await _userService.GetUsers(searchQuery, pageNumber, pageSize);
+
             if (users.Count() == 0)
                 return NotFound("there is no users registered yet !");
 
@@ -48,10 +49,10 @@ namespace WebApplication1.Controllers
         public async Task<ActionResult<UsersResponse>> GetFollowers([FromRoute(Name = "UserId")] int userId)
         {
             var userResponses = await _userService.GetFollowers(userId);
+
             if (userResponses.Count() == 0)
-            {
                 return Ok("user have 0 followers");
-            }
+
             return Ok(userResponses);
         }
 
@@ -61,9 +62,7 @@ namespace WebApplication1.Controllers
             var userResponses = await _userService.GetFollowing(userId);
 
             if (userResponses.Count() == 0)
-            {
                 return Ok("user doesn't follow any other user ");
-            }
 
             return Ok(userResponses);
         }
@@ -73,6 +72,7 @@ namespace WebApplication1.Controllers
         {
             var sessionUser = _sessionDataManagment.GetUserFromSession();
             await _userService.Follow(userId, followRequest, sessionUser);
+
             return Ok("user followed succesfully");
         }
 
@@ -81,6 +81,7 @@ namespace WebApplication1.Controllers
         {
             var sessionUser = _sessionDataManagment.GetUserFromSession();
             await _userService.Unfollow(userId, UserToUnfollowId, sessionUser);
+
             return Ok("user unfollowed succesfully");
         }
 
@@ -89,6 +90,7 @@ namespace WebApplication1.Controllers
         {
             var sessionUser = _sessionDataManagment.GetUserFromSession();
             await _userService.RemoveFollower(userId, userToRemove, sessionUser);
+
             return Ok("user removed from followers successfully");
         }
 
@@ -104,6 +106,7 @@ namespace WebApplication1.Controllers
         {
             var sessionUser = _sessionDataManagment.GetUserFromSession();
             await _userService.AddToFavoriteArticles(userId, request, sessionUser);
+
             return Ok("Article successfully added to favorites");
         }
 
@@ -112,6 +115,7 @@ namespace WebApplication1.Controllers
         {
             var sessionUser = _sessionDataManagment.GetUserFromSession();
             await _userService.RemoveFromFavourites(userId, request, sessionUser);
+
             return Ok("Article successfully removed from yur favorites");
         }
 
