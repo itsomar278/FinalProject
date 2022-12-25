@@ -3,6 +3,7 @@ using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,11 +15,17 @@ namespace FinalProject.DL
 {
     public class MyExceptionFilter : IExceptionFilter
     {
+        private readonly ILogger _logger;
+
+        public MyExceptionFilter(ILogger logger)
+        {
+            _logger = logger;
+        }
         public void OnException(ExceptionContext context)
         {
             var exception = context.Exception;
             int statusCode;
-
+            _logger.Error(exception, "An exception occurred while processing a request");
             switch (true)
             {
                 case bool _ when exception is RecordNotFoundException:
@@ -38,7 +45,6 @@ namespace FinalProject.DL
                     statusCode = (int)HttpStatusCode.InternalServerError;
                     break;
             }
-
             context.Result = new ObjectResult(exception.Message)
             {
                 StatusCode = statusCode
