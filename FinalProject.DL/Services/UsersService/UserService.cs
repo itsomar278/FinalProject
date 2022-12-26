@@ -7,17 +7,20 @@ using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
+using WebApplication1.Attributes;
 
-namespace Domain.Services
+
+namespace Domain.Services.UsersService
 {
-    public class UsersService : IUserService
+    [RegisterAsScoped]
+    public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public UsersService(IUnitOfWork unitOfWork , IMapper mapper)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
-            _mapper = mapper; 
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<UsersResponse>> GetUsers(string? searchQuery, int pageNumber = 1, int pageSize = 3)
@@ -30,8 +33,8 @@ namespace Domain.Services
         public async Task<UsersResponse> GetUser(int userId)
         {
             if (!await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId))
-                throw new  RecordNotFoundException("cannot find the specified user");
-            
+                throw new RecordNotFoundException("cannot find the specified user");
+
             var user = await _unitOfWork.Users.GetAsync(userId);
             var userResponse = _mapper.Map<UsersResponse>(user);
 
@@ -41,7 +44,7 @@ namespace Domain.Services
         {
             if (!await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId))
                 throw new RecordNotFoundException("Cannot find the specified user");
-            
+
             var followersId = _unitOfWork.Follows.GetAllFollowersId(userId);
             List<UsersResponse> usersResponses = new List<UsersResponse>();
 
@@ -78,11 +81,11 @@ namespace Domain.Services
 
             if (userId != sessionUser.UserId)
                 throw new UnauthorizedUserException("Unauthorized");
-           
+
             if (!await _unitOfWork.Users.DoesExistAsync(u => u.UserId == followRequest.UserToFollowId))
                 throw new RecordNotFoundException("cant find a user to follow with such id");
 
-            if (await(_unitOfWork.Follows.DoesExistAsync(f => f.FollowerId == userId && f.FollowedId == followRequest.UserToFollowId)))
+            if (await _unitOfWork.Follows.DoesExistAsync(f => f.FollowerId == userId && f.FollowedId == followRequest.UserToFollowId))
                 throw new AlreadyExistingRecordException("you already follow this user");
 
             var follow = _mapper.Map<Follow>((followRequest, userId));
@@ -106,9 +109,9 @@ namespace Domain.Services
             _unitOfWork.Follows.Remove(follow);
             await _unitOfWork.complete();
 
-            return await Task.FromResult(new OkResult());   
+            return await Task.FromResult(new OkResult());
         }
-        public async Task<ActionResult> RemoveFollower(int userId , int userToRemoveId , UserSessionModel sessionUser)
+        public async Task<ActionResult> RemoveFollower(int userId, int userToRemoveId, UserSessionModel sessionUser)
         {
             if (sessionUser == null)
                 throw new UnauthorizedUserException("you need to re-login");
@@ -145,7 +148,7 @@ namespace Domain.Services
 
             return await Task.FromResult(articleResponses);
         }
-        public async Task<ActionResult> AddToFavoriteArticles(int userId, AddToFavouritesRequest request , UserSessionModel sessionUser)
+        public async Task<ActionResult> AddToFavoriteArticles(int userId, AddToFavouritesRequest request, UserSessionModel sessionUser)
         {
             if (sessionUser == null)
                 throw new RecordNotFoundException("cannot find the specifed user ");
@@ -169,17 +172,17 @@ namespace Domain.Services
         {
             if (sessionUser == null)
                 throw new UnauthorizedUserException("you need to re-login");
-            
+
             if (sessionUser.UserId != userId)
                 throw new UnauthorizedUserException("Unauthorized action");
-            
+
             if (!await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == request.ArticleId))
                 throw new RecordNotFoundException("cannot find an article with such id");
-            
+
             if (!await _unitOfWork.Favorites.DoesExistAsync(f => f.UserId == userId && f.ArticleId == request.ArticleId))
                 throw new RecordNotFoundException("there is no article with such id in your favorites");
-            
-            var favorite =await _unitOfWork.Favorites.GetAsync((request.ArticleId, userId));
+
+            var favorite = await _unitOfWork.Favorites.GetAsync((request.ArticleId, userId));
             _unitOfWork.Favorites.Remove(favorite);
             await _unitOfWork.complete();
 

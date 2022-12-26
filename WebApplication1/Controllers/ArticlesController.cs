@@ -1,13 +1,11 @@
-﻿using AutoMapper;
-using Domain.Services.ArticlesService;
+﻿
+using Domain.Services.ArticleService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.DataAccess.UnitOfWorks;
-using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
-using WebApplication1.Services.SessionManagment;
+using WebApplication1.Services.Session;
 
 namespace WebApplication1.Controllers
 {
@@ -33,7 +31,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ArticleResponse>> GetArticles(string? title, string? searchQuery, int pageNumber = 1, int pageSize = 2)
+        public async Task<ActionResult<ArticleResponse>> GetArticles(string? title, string? searchQuery, int pageNumber = 1, int pageSize = 2) // create request contains these params 
         {
             if (pageSize > maxArticlesPageSize)
             {
@@ -72,44 +70,6 @@ namespace WebApplication1.Controllers
             await _articleService.ArticlePartialUpdate(articleId, patchDocument , user);
 
             return Ok("Article successfully updated");
-        }
-
-        [HttpGet("{ArticleId}/Comments")]
-        public async Task<ActionResult<CommentResponse>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
-        {
-            var responses = await _articleService.GetCommentsOnArticle(articleId);
-            if (responses.Count() == 0)
-            {
-                return Ok("there is no comments on this article");
-            }
-
-            return Ok(responses);
-        }
-
-        [HttpGet("{ArticleId}/Comments/{CommentId}")]
-        public async Task<ActionResult<CommentResponse>> GetCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, [FromRoute(Name = "CommentId")] int commentId)
-        {
-            var response = await _articleService.GetCommentOnArticle(articleId, commentId);
-
-            return Ok(response);
-        }
-
-        [HttpPost("{ArticleId}/Comments"), Authorize]
-        public async Task<ActionResult<Articles>> PostComment(CommentRequest request, [FromRoute(Name = "ArticleId")] int articleId)
-        {
-            var user = _sessionDataManagment.GetUserFromSession();
-            await _articleService.PostComment(articleId, user, request);
-
-            return Ok("comment successfully posted");
-        }
-
-        [HttpDelete("{ArticleId}/Comments"), Authorize]
-        public async Task<ActionResult> DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, CommentDeleteRequest request)
-        {
-            var user = _sessionDataManagment.GetUserFromSession();
-            await _articleService.DeleteCommentOnArticle(articleId, user, request);
-
-            return Ok("comment deleted successfully");
         }
     }
 }

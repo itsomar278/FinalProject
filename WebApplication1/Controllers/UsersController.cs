@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using Domain.Services;
+using Domain.Services.UsersService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
-using WebApplication1.Services.Authentication;
-using WebApplication1.Services.SessionManagment;
+using WebApplication1.Services.AuthService;
+using WebApplication1.Services.Session;
 
 namespace WebApplication1.Controllers
 {
@@ -25,7 +25,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<UsersResponse>> GetUsers(string? searchQuery, int pageNumber = 1, int pageSize = 3)
+        public async Task<ActionResult<UsersResponse>> GetUsers(string? searchQuery, int pageNumber = 1, int pageSize = 3) // create request for these params
         {
             if (pageSize > maxUsersPageSize)
                 pageSize = maxUsersPageSize;
@@ -95,7 +95,7 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet("{UserId}/favorite-Articles"), Authorize]
-        public async Task<ActionResult<ArticleResponse>> GetFavoriteArticles([FromRoute(Name = "UserId")] int userId, int pageNumber = 1, int pageSize = 2)
+        public async Task<ActionResult<ArticleResponse>> GetFavoriteArticles([FromRoute(Name = "UserId")] int userId, int pageNumber = 1, int pageSize = 2) 
         {
             var favoriteArticles = await _userService.GetFavoriteArticles(userId, pageNumber, pageSize);
             return Ok(favoriteArticles);

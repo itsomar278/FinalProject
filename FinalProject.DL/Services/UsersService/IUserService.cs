@@ -8,7 +8,7 @@ using WebApplication1.Models;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
 
-namespace Domain.Services
+namespace Domain.Services.UsersService
 {
     public interface IUserService
     {
@@ -20,7 +20,7 @@ namespace Domain.Services
         Task<ActionResult> Unfollow(int userId, int UserToUnfollowId, UserSessionModel sessionUser);
         Task<ActionResult> RemoveFollower(int userId, int UserToRemoveId, UserSessionModel sessionUser);
         Task<IEnumerable<ArticleResponse>> GetFavoriteArticles(int userId, int pageNumber, int pageSize);
-        Task<ActionResult> AddToFavoriteArticles(int userId, AddToFavouritesRequest request , UserSessionModel sessionUser);
+        Task<ActionResult> AddToFavoriteArticles(int userId, AddToFavouritesRequest request, UserSessionModel sessionUser);
         Task<ActionResult> RemoveFromFavourites(int userId, RemoveFromFavouritesRequest request, UserSessionModel sessionUser);
 
     }

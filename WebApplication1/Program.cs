@@ -1,6 +1,6 @@
-
-using Domain.Services;
-using Domain.Services.ArticlesService;
+using Domain.Services.ArticleService;
+using Domain.Services.CommentService;
+using Domain.Services.UsersService;
 using FinalProject.DL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -19,9 +19,8 @@ using WebApplication1.DataAccess.Repositories.RefreshTokenRepository;
 using WebApplication1.DataAccess.Repositories.UsersRepository;
 using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Mapping;
-using WebApplication1.Services.Authentication;
-using WebApplication1.Services.SessionDataManagment;
-using WebApplication1.Services.SessionManagment;
+using WebApplication1.Services.AuthService;
+using WebApplication1.Services.Session;
 
 namespace WebApplication1
 {
@@ -57,10 +56,11 @@ namespace WebApplication1
                 builder.Services.AddTransient<IFavouriteRepository, FavouriteRepository>();
                 builder.Services.AddTransient<IRefreshTokenRepository, RefreshTokensRepository>();
                 builder.Services.AddTransient<ISessionDataManagment, SessionDataManagment>();
+                builder.Services.AddTransient<ICommentsService, CommentsService>();
                 builder.Services.AddHttpContextAccessor();
-                builder.Services.AddScoped<IAuthinticateService, AuthenticationService>();
+                builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
                 builder.Services.AddScoped<IArticleService, ArticlesService>();
-                builder.Services.AddScoped<IUserService, UsersService>();
+                builder.Services.AddScoped<IUserService, UserService>();
                 builder.Services.AddScoped<MyExceptionFilter>();
                 builder.Services.AddSingleton<Serilog.ILogger>(Log.Logger);
                 builder.Services.AddSession(options =>
@@ -116,7 +116,6 @@ namespace WebApplication1
                 }
                 app.UseSession();
 
-
                 app.UseSerilogRequestLogging();
 
                 app.UseCookiePolicy();
@@ -129,7 +128,7 @@ namespace WebApplication1
 
                 app.MapControllers();
 
-                //app.Run();
+                app.Run();
             }
             catch(Exception ex )
             {

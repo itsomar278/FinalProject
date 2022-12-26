@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
-using WebApplication1.Services.Authentication;
-using WebApplication1.Services.SessionManagment;
+using WebApplication1.Services.AuthService;
+using WebApplication1.Services.Session;
 
 namespace WebApplication1.Controllers
 {
@@ -13,10 +13,10 @@ namespace WebApplication1.Controllers
     [Route("[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly IAuthinticateService _authinticateService;
+        private readonly IAuthenticationService _authinticateService;
         private readonly ISessionDataManagment _sessionDataManagment;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public AuthController( IAuthinticateService authinticateService, ISessionDataManagment sessionDataManagment , IHttpContextAccessor httpContextAccessor)
+        public AuthController( IAuthenticationService authinticateService, ISessionDataManagment sessionDataManagment , IHttpContextAccessor httpContextAccessor)
         {
             _authinticateService = authinticateService;
             _sessionDataManagment = sessionDataManagment;

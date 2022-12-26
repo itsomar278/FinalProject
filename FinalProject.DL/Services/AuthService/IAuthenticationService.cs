@@ -3,9 +3,9 @@ using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 
-namespace WebApplication1.Services.Authentication
+namespace WebApplication1.Services.AuthService
 {
-    public interface IAuthinticateService
+    public interface IAuthenticationService
     {
         void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
         Task<bool> VerifyPasswordHash(string password, byte[] passwordHash, byte[] passwordSalt);

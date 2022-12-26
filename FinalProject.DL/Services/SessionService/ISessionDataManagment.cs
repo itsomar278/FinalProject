@@ -2,7 +2,7 @@
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 
-namespace WebApplication1.Services.SessionManagment
+namespace WebApplication1.Services.Session
 {
     public interface ISessionDataManagment
     {

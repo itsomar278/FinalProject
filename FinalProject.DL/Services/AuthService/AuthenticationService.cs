@@ -6,14 +6,16 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using WebApplication1.Attributes;
 using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 
-namespace WebApplication1.Services.Authentication
+namespace WebApplication1.Services.AuthService
 {
-    public class AuthenticationService : IAuthinticateService
+    [RegisterAsScoped]
+    public class AuthenticationService : IAuthenticationService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
@@ -133,7 +135,7 @@ namespace WebApplication1.Services.Authentication
                 throw new UnauthorizedUserException("you are not logged in in the first place");
 
             if (await _unitOfWork.RefreshTokens.DoesExistAsync(rt => rt.UserId == user.UserId))
-                DeleteUserRefreshToken(user.UserEmail);
+                await DeleteUserRefreshToken(user.UserEmail);
 
             return await Task.FromResult(new OkResult());
         }

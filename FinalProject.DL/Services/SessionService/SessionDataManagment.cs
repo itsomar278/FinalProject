@@ -1,13 +1,15 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using WebApplication1.Attributes;
 using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
-using WebApplication1.Services.SessionManagment;
+using WebApplication1.Services.Session;
 
-namespace WebApplication1.Services.SessionDataManagment
+namespace WebApplication1.Services.Session
 {
+    [RegisterAsScoped]
     public class SessionDataManagment : ISessionDataManagment
     {
         private readonly IHttpContextAccessor _httpContextAccessor ;
