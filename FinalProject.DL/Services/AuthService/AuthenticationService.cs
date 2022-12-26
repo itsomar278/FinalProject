@@ -6,7 +6,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using WebApplication1.Attributes;
 using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
@@ -14,7 +13,6 @@ using WebApplication1.Models.Requests;
 
 namespace WebApplication1.Services.AuthService
 {
-    [RegisterAsScoped]
     public class AuthenticationService : IAuthenticationService
     {
         private readonly IUnitOfWork _unitOfWork;

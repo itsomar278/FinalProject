@@ -1,10 +1,10 @@
 ﻿using AutoMapper;
+using Domain.Models.Requests;
 using Domain.Services.ArticleService;
 using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System.Web.Http.ModelBinding;
-using WebApplication1.Attributes;
 using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
@@ -13,7 +13,6 @@ using WebApplication1.Models.Response;
 
 namespace Domain.Services.ArticleService
 {
-    [RegisterAsScoped]
     public class ArticlesService : IArticleService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -83,9 +82,9 @@ namespace Domain.Services.ArticleService
         }
 
 
-        public async Task<IEnumerable<ArticleResponse>> GetArticles(string? title, string? searchQuery, int pageNumber, int pageSize)
+        public async Task<IEnumerable<ArticleResponse>> GetArticles(ArticlesSearchRequest articlesSearchRequest)
         {
-            var articles = await _unitOfWork.Articles.GetArticlesAsync(title, searchQuery, pageNumber, pageSize);
+            var articles = await _unitOfWork.Articles.GetArticlesAsync(articlesSearchRequest.title, articlesSearchRequest.searchQuery, articlesSearchRequest.pageNumber, articlesSearchRequest.pageSize);
 
             if (articles.Count() == 0)
                return Enumerable.Empty<ArticleResponse>();

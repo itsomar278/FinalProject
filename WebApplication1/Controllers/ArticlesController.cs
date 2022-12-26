@@ -1,4 +1,5 @@
 ﻿
+using Domain.Models.Requests;
 using Domain.Services.ArticleService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
@@ -31,14 +32,14 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<ArticleResponse>> GetArticles(string? title, string? searchQuery, int pageNumber = 1, int pageSize = 2) // create request contains these params 
+        public async Task<ActionResult<ArticleResponse>> GetArticles([FromQuery] ArticlesSearchRequest articlesSearchRequest) // create request contains these params 
         {
-            if (pageSize > maxArticlesPageSize)
+            if (articlesSearchRequest.pageSize > maxArticlesPageSize)
             {
-                pageSize = maxArticlesPageSize;
+                articlesSearchRequest.pageSize = maxArticlesPageSize;
             }
 
-            var articles = await _articleService.GetArticles(title, searchQuery, pageNumber, pageSize);
+            var articles = await _articleService.GetArticles(articlesSearchRequest);
             if (articles.Count() == 0)
             {
                 return Ok("no articles posted yet");

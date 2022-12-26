@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Domain.Models.Requests;
 using Domain.Services.UsersService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,23 +15,23 @@ namespace WebApplication1.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-      
+
         private readonly ISessionDataManagment _sessionDataManagment;
         private readonly IUserService _userService;
         const int maxUsersPageSize = 7;
-        public UsersController( ISessionDataManagment sessionDataManagment, IUserService userService)
-        { 
+        public UsersController(ISessionDataManagment sessionDataManagment, IUserService userService)
+        {
             _sessionDataManagment = sessionDataManagment;
             _userService = userService;
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<UsersResponse>> GetUsers(string? searchQuery, int pageNumber = 1, int pageSize = 3) // create request for these params
+        public async Task<ActionResult<UsersResponse>> GetUsers([FromQuery] UserSearchRequest userSearchRequest) // create request for these params
         {
-            if (pageSize > maxUsersPageSize)
-                pageSize = maxUsersPageSize;
+            if (userSearchRequest.pageSize > maxUsersPageSize)
+                userSearchRequest.pageSize = maxUsersPageSize;
 
-            var users = await _userService.GetUsers(searchQuery, pageNumber, pageSize);
+            var users = await _userService.GetUsers(userSearchRequest);
 
             if (users.Count() == 0)
                 return NotFound("there is no users registered yet !");
@@ -95,9 +96,9 @@ namespace WebApplication1.Controllers
         }
 
         [HttpGet("{UserId}/favorite-Articles"), Authorize]
-        public async Task<ActionResult<ArticleResponse>> GetFavoriteArticles([FromRoute(Name = "UserId")] int userId, int pageNumber = 1, int pageSize = 2) 
+        public async Task<ActionResult<ArticleResponse>> GetFavoriteArticles([FromRoute(Name = "UserId")] int userId,[FromQuery] PagingRequest pagingRequest) 
         {
-            var favoriteArticles = await _userService.GetFavoriteArticles(userId, pageNumber, pageSize);
+            var favoriteArticles = await _userService.GetFavoriteArticles(userId, pagingRequest);
             return Ok(favoriteArticles);
         }
 

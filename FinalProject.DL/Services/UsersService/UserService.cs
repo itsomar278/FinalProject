@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Exceptions;
+using Domain.Models.Requests;
 using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DataAccess.UnitOfWorks;
@@ -7,12 +8,10 @@ using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
-using WebApplication1.Attributes;
 
 
 namespace Domain.Services.UsersService
 {
-    [RegisterAsScoped]
     public class UserService : IUserService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -23,9 +22,9 @@ namespace Domain.Services.UsersService
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UsersResponse>> GetUsers(string? searchQuery, int pageNumber = 1, int pageSize = 3)
+        public async Task<IEnumerable<UsersResponse>> GetUsers(UserSearchRequest userSearchRequest )
         {
-            var users = await _unitOfWork.Users.GetUsersAsync(searchQuery, pageNumber, pageSize);
+            var users = await _unitOfWork.Users.GetUsersAsync(userSearchRequest.searchQuery, userSearchRequest.pageNumber, userSearchRequest.pageSize);
             var usersResponses = _mapper.Map<List<UsersResponse>>(users);
 
             return await Task.FromResult(usersResponses);
@@ -128,7 +127,7 @@ namespace Domain.Services.UsersService
 
             return await Task.FromResult(new OkResult());
         }
-        public async Task<IEnumerable<ArticleResponse>> GetFavoriteArticles(int userId, int pageNumber, int pageSize)
+        public async Task<IEnumerable<ArticleResponse>> GetFavoriteArticles(int userId, PagingRequest pagingRequest)
         {
             var user = await _unitOfWork.Users.GetAsync(userId);
 
@@ -138,7 +137,7 @@ namespace Domain.Services.UsersService
             var favoriteArticles = await _unitOfWork.Favorites.FindAsync(f => f.UserId == userId);
             List<ArticleResponse> articleResponses = new List<ArticleResponse>();
 
-            foreach (var favorite in favoriteArticles.Skip(pageSize * (pageNumber - 1)).Take(pageSize))
+            foreach (var favorite in favoriteArticles.Skip(pagingRequest.pageSize * (pagingRequest.pageNumber - 1)).Take(pagingRequest.pageSize))
             {
                 var article = await _unitOfWork.Articles.GetAsync(favorite.ArticleId);
                 var author = await _unitOfWork.Users.GetAsync(article.UserId);
