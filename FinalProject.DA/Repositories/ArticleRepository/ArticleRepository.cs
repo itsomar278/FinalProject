@@ -22,19 +22,23 @@ namespace WebApplication1.DataAccess.Repositories.ArticleRepository
                 articles = await _DbContext.Set<Articles>().OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
                 return articles;
             }
+
             if (!string.IsNullOrEmpty(title) && string.IsNullOrEmpty(searchQuery))
             {
                 articles = await _DbContext.Set<Articles>().Where(a => a.Title.Contains(title)).OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
                 return articles;
             }
+
             if (string.IsNullOrEmpty(title) && !string.IsNullOrEmpty(searchQuery))
             {
                 articles = await _DbContext.Set<Articles>().Where(a => a.Content.Contains(searchQuery))
                     .OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
                 return articles;
             }
+
             articles = await _DbContext.Set<Articles>().Where(a => a.Content.Contains(searchQuery) && a.Title.Contains(title))
                     .OrderBy(a => a.Title).Skip(pageSize * (pageNumber - 1)).Take(pageSize).ToListAsync();
+
             return articles;
         }
     }

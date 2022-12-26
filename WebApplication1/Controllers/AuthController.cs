@@ -101,13 +101,6 @@ namespace WebApplication1.Controllers
             await _authinticateService.UpdateUserName(request, sessionUser);
             return Ok("User Name updated successfully");
         }
-        private void DeleteSession()
-        {
-            foreach (var cookie in Request.Cookies.Keys)
-            {
-                if (cookie == ".AspNetCore.Session")
-                    Response.Cookies.Delete(cookie);
-            }
-        }
+        
     }
 }

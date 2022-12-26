@@ -98,14 +98,14 @@ namespace WebApplication1
                 ClockSkew = TimeSpan.Zero
             };
         });
-                builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins",
-                        policy =>
+                builder.Services.AddCors(options => options.AddPolicy(name: "NgOrigins", policy =>
                         {
                             policy.WithOrigins("https://localhost:7248/").AllowAnyMethod().AllowAnyHeader();
                         }));
-                builder.Services.AddMvc(
-                       options => { options.Filters.Add<MyExceptionFilter>(); }
-                                       );
+                builder.Services.AddMvc( options => 
+                { 
+                    options.Filters.Add<MyExceptionFilter>();
+                });
                 var app = builder.Build();
 
                 // Configure the HTTP request pipeline.

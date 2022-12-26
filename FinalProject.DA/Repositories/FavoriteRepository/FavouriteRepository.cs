@@ -8,10 +8,12 @@ namespace WebApplication1.DataAccess.Repositories.FavoriteRepository
         public FavouriteRepository(ProjectDbContext dbContext) : base(dbContext)
         {
         }
+
         public ProjectDbContext projectDbContext
         {
             get { return _DbContext as ProjectDbContext; }
         }
+
         override
            public Task<Favorite> GetAsync(int id)
         {

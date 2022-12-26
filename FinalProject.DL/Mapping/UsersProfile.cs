@@ -15,15 +15,19 @@ namespace WebApplication1.Mapping
                 .ForMember(u => u.UserEmail, m => m.MapFrom(source => source.request.UserEmail))
                 .ForMember(u => u.PasswordHash, m => m.MapFrom(source => source.PasswordHash))
                 .ForMember(u => u.PasswordSalt, m => m.MapFrom(source => source.passwordSalt));
+
             CreateMap<Users, UsersResponse>()
                 .ForMember(ur => ur.UserName, m => m.MapFrom(source => source.UserName))
                 .ForMember(ur => ur.UserEmail, m => m.MapFrom(source => source.UserEmail));
+
             CreateMap<(FollowRequest request, int userId), Follow>()
                 .ForMember(f => f.FollowedId, m => m.MapFrom(source => source.request.UserToFollowId))
                 .ForMember(f => f.FollowerId, m => m.MapFrom(source => source.userId));
+
             CreateMap<(AddToFavouritesRequest request, int userId), Favorite>()
                 .ForMember(f => f.UserId, m => m.MapFrom(source => source.userId))
                 .ForMember(f => f.ArticleId, m => m.MapFrom(source => source.request.ArticleId));
+
             CreateMap<Users, UserSessionModel>()
                 .ForMember(us => us.UserName, m => m.MapFrom(source => source.UserName))
                 .ForMember(us => us.UserEmail, m => m.MapFrom(source => source.UserEmail))

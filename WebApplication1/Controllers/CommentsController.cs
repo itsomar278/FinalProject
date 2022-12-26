@@ -20,6 +20,7 @@ namespace WebApplication1.Controllers
             _sessionDataManagment = sessionDataManagment;
             _commentsService = commentsService;
         }
+
         [HttpGet("{ArticleId}/Comments")]
         public async Task<ActionResult<CommentResponse>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
         {

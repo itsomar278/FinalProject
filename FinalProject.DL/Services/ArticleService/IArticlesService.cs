@@ -21,6 +21,5 @@ namespace Domain.Services.ArticleService
         Task<ArticleResponse> GetArticle(int articleId);
         Task<ActionResult> DeleteArticle(int articleId, UserSessionModel user);
         Task<ActionResult> ArticlePartialUpdate(int articleId, JsonPatchDocument<ArticlePostRequest> patchDocument, UserSessionModel user);
-
     }
 }
