@@ -27,7 +27,7 @@ namespace WebApplication1.Mapping
                 .ForMember(f => f.FollowedId, m => m.MapFrom(source => source.request.UserToFollowId))
                 .ForMember(f => f.FollowerId, m => m.MapFrom(source => source.userId));
 
-            CreateMap<(AddToFavouritesRequest request, int userId), Favorite>()
+            CreateMap<(AddToFavouritesRequestDto request, int userId), Favorite>()
                 .ForMember(f => f.UserId, m => m.MapFrom(source => source.userId))
                 .ForMember(f => f.ArticleId, m => m.MapFrom(source => source.request.ArticleId));
 
@@ -38,6 +38,11 @@ namespace WebApplication1.Mapping
 
             CreateMap<UserSearchRequest, UserSearchRequestDto>();
             CreateMap<UserResponseDto, UsersResponse>();
+            CreateMap<FollowRequest, FollowRequestDto>();
+            CreateMap<UnfollowRequest, UnfollowRequestDto>();
+            CreateMap<RemoveFollowerRequest, RemoveFollowerRequestDto>();
+            CreateMap<PagingRequest, PagingRequestDto>();
+            CreateMap<AddToFavouritesRequest, AddToFavouritesRequestDto>();
         }
     }
 }

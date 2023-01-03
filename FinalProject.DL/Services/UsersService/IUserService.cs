@@ -19,12 +19,12 @@ namespace Domain.Services.UsersService
         Task<UserResponseDto> GetUser(int userId);
         Task<IEnumerable<UserResponseDto>> GetFollowers(int userId);
         Task<IEnumerable<UserResponseDto>> GetFollowing(int userId);
-        Task<ActionResult> Follow(int userId, FollowRequest followRequest, UserSessionModel sessionUser);
-        Task<ActionResult> Unfollow(int userId, int UserToUnfollowId, UserSessionModel sessionUser);
-        Task<ActionResult> RemoveFollower(int userId, int UserToRemoveId, UserSessionModel sessionUser);
-        Task<IEnumerable<ArticleResponse>> GetFavoriteArticles(int userId, PagingRequest pagingRequest);
-        Task<ActionResult> AddToFavoriteArticles(int userId, AddToFavouritesRequest request, UserSessionModel sessionUser);
-        Task<ActionResult> RemoveFromFavourites(int userId, RemoveFromFavouritesRequest request, UserSessionModel sessionUser);
+        Task<ActionResult> Follow(int userId, FollowRequestDto followRequest, UserSessionModel sessionUser);
+        Task<ActionResult> Unfollow(int userId, UnfollowRequestDto unfollowRequest, UserSessionModel sessionUser);
+        Task<ActionResult> RemoveFollower(int userId, RemoveFollowerRequestDto removeFollowerRequest, UserSessionModel sessionUser);
+        Task<IEnumerable<ArticleResponseDto>> GetFavoriteArticles(int userId, PagingRequestDto pagingRequest);
+        Task<ActionResult> AddToFavoriteArticles(int userId, AddToFavouritesRequestDto request, UserSessionModel sessionUser);
+        Task<ActionResult> RemoveFromFavourites(int userId, RemoveFromFavouritesRequestDto request, UserSessionModel sessionUser);
 
     }
 }
