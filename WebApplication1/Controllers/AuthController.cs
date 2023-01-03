@@ -1,12 +1,10 @@
 using AutoMapper;
 using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Services.AuthService;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.DataAccess.UnitOfWorks;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
-using WebApplication1.Services.AuthService;
-using WebApplication1.Services.Session;
+using WebApplication1.Requests;
 
 namespace WebApplication1.Controllers
 {
@@ -32,6 +30,7 @@ namespace WebApplication1.Controllers
         {
             var requestDto = _mapper.Map<UserRegisterRequestDto>(request);
             await _authinticateService.Register(requestDto);
+
             return Ok("user registerd successfully");
         }
 
@@ -61,14 +60,17 @@ namespace WebApplication1.Controllers
         {
             var refreshToken = Request.Cookies["refreshToken"];
             var sessionUser = _sessionDataManagment.GetUserFromSession();
+
             foreach (var cookie in Request.Cookies.Keys)
             {
-                if (cookie == ".AspNetCore.Session" || cookie == "refreshToken")
+                if ( cookie == "refreshToken")
                     Response.Cookies.Delete(cookie);
             }
+
             string token = await _authinticateService.RefreshToken(sessionUser, refreshToken);
             var newRefreshToken = await _authinticateService.GenerateRefreshToken(sessionUser.UserEmail);
             await _authinticateService.UpdateUserRefreshToken(sessionUser.UserEmail, newRefreshToken);
+
             var cookieOptions = new CookieOptions
             {
                 HttpOnly = true,
@@ -76,6 +78,7 @@ namespace WebApplication1.Controllers
             };
             Response.Cookies.Append("refreshToken", newRefreshToken.Token, cookieOptions);
             await _sessionDataManagment.StoreUserInSession(sessionUser.UserEmail);
+
             return Ok(token);
         }
 
@@ -84,11 +87,13 @@ namespace WebApplication1.Controllers
         {
             var userToLogout = _sessionDataManagment.GetUserFromSession();
             await _authinticateService.logout(userToLogout);
+
             foreach (var cookie in Request.Cookies.Keys)
             {
                 if (cookie == ".AspNetCore.Session" || cookie == "refreshToken")
                     Response.Cookies.Delete(cookie);
             }
+
             return Ok("user loged out succesfully");
         }
 
@@ -98,6 +103,7 @@ namespace WebApplication1.Controllers
             var requestDto = _mapper.Map<UserPasswordUpdateRequestDto>(request);
             var sessionUser = _sessionDataManagment.GetUserFromSession();
             await _authinticateService.UpdatePassword(requestDto, sessionUser);
+
             return Ok("Password updated successfully");
         }
 
@@ -106,7 +112,11 @@ namespace WebApplication1.Controllers
         {
             var requestDto = _mapper.Map<UpdateUserNameRequestDto>(request);
             var sessionUser = _sessionDataManagment.GetUserFromSession();
+
             await _authinticateService.UpdateUserName(requestDto, sessionUser);
+
+            await _sessionDataManagment.StoreUserInSession(sessionUser.UserEmail);
+
             return Ok("User Name updated successfully");
         }
         

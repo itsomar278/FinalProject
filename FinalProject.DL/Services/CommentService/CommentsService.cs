@@ -1,18 +1,11 @@
 ﻿using AutoMapper;
-using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebApplication1.DataAccess.UnitOfWorks;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models;
-using WebApplication1.Models.Response;
-using WebApplication1.Models.Entites;
 using Domain.Models.DTO_s.ResponseDto_s;
 using Domain.Models.DTO_s.RequestDto_s;
+using DataAcess.UnitOfWorks;
+using Domain.Exceptions;
+using DataAcess.Entites;
+using Domain.Services.SessionService;
 
 namespace Domain.Services.CommentService
 {
@@ -66,11 +59,10 @@ namespace Domain.Services.CommentService
             if (!await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId))
                 throw new RecordNotFoundException("specified article cannot be found");
 
-
             var comments = await _unitOfWork.Comments.FindAsync(c => c.ArticleId == articleId);
+
             if (comments.Count() == 0)
                 return Enumerable.Empty<CommentResponseDto>();
-
 
             List<CommentResponseDto> responses = new List<CommentResponseDto>(); // should use select 
             foreach (var comment in comments)

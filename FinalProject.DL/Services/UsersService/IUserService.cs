@@ -1,15 +1,8 @@
 ﻿using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.DTO_s.ResponseDto_s;
-using Domain.Models.Requests;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebApplication1.Models;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
+
 
 namespace Domain.Services.UsersService
 {

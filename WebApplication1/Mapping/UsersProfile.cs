@@ -1,19 +1,18 @@
 ﻿using AutoMapper;
+using DataAcess.Entites;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.DTO_s.ResponseDto_s;
-using Domain.Models.Requests;
-using WebApplication1.Models;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
+using Domain.Services.SessionService;
+using WebApplication1.Requests;
+using WebApplication1.Response;
 
 namespace WebApplication1.Mapping
 {
     public class UsersProfile : Profile
     {
-        public UsersProfile() 
+        public UsersProfile()
         {
-            CreateMap<(UserRegisterRequest request, byte[] PasswordHash, byte[] passwordSalt), Users>()
+            CreateMap<(UserRegisterRequestDto request, byte[] PasswordHash, byte[] passwordSalt), Users>()
                 .ForMember(u => u.UserName, m => m.MapFrom(source => source.request.UserName))
                 .ForMember(u => u.UserEmail, m => m.MapFrom(source => source.request.UserEmail))
                 .ForMember(u => u.PasswordHash, m => m.MapFrom(source => source.PasswordHash))

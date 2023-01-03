@@ -1,18 +1,16 @@
 ﻿using AutoMapper;
+using DataAcess.Entites;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.DTO_s.ResponseDto_s;
-using Domain.Models.Requests;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.JsonPatch.Operations;
-using System.Security.Principal;
-using WebApplication1.Models;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
+using WebApplication1.Requests;
+using WebApplication1.Response;
 
 namespace WebApplication1.Mapping
 {
-    public class ArticlesProfile: Profile
+    public class ArticlesProfile : Profile
     {
         public ArticlesProfile()
         {
@@ -21,12 +19,12 @@ namespace WebApplication1.Mapping
                    .ForMember(a => a.Content, m => m.MapFrom(source => source.request.Content))
                    .ForMember(sss => sss.Title, m => m.MapFrom(source => source.request.Title));
 
-            CreateMap<(Articles article , Users user), ArticleResponseDto>()
+            CreateMap<(Articles article, Users user), ArticleResponseDto>()
                   .ForMember(a => a.AuthorUserName, m => m.MapFrom(source => source.user.UserName))
                   .ForMember(a => a.Content, m => m.MapFrom(source => source.article.Content))
                   .ForMember(a => a.Title, m => m.MapFrom(source => source.article.Title));
 
-            CreateMap<Articles , ArticlePostRequestDto>()
+            CreateMap<Articles, ArticlePostRequestDto>()
                 .ForMember(ap => ap.Title, m => m.MapFrom(source => source.Title))
                 .ForMember(ap => ap.Content, m => m.MapFrom(source => source.Content))
                 .ReverseMap();
@@ -41,7 +39,7 @@ namespace WebApplication1.Mapping
 
             CreateMap<Operation<ArticlePostRequest>, Operation<ArticlePostRequestDto>>();
 
-            CreateMap<ArticleResponseDto , ArticleResponse>();
+            CreateMap<ArticleResponseDto, ArticleResponse>();
         }
     }
 }

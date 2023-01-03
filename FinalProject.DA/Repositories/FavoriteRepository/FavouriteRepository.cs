@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models.Entites;
+﻿using DataAcess.Entites;
+using Microsoft.EntityFrameworkCore;
 
-namespace WebApplication1.DataAccess.Repositories.FavoriteRepository
+namespace DataAcess.Repositories.FavoriteRepository
 {
     public class FavouriteRepository : Repository<Favorite>, IFavouriteRepository
     {

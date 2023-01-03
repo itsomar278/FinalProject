@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models.Entites;
+﻿using DataAcess.Entites;
+using Microsoft.EntityFrameworkCore;
 
-namespace WebApplication1.DataAccess
+namespace DataAcess
 {
     public class ProjectDbContext : DbContext
     {
@@ -17,14 +17,14 @@ namespace WebApplication1.DataAccess
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Favorite>()
-                .HasKey(ua => new { ua.ArticleId ,ua.UserId });
+                .HasKey(ua => new { ua.ArticleId, ua.UserId });
             modelBuilder.Entity<Favorite>()
-                        .HasOne<Users>(f => f.User)
+                        .HasOne(f => f.User)
                         .WithMany(u => u.FavoriteArticles)
                         .HasForeignKey(f => f.UserId)
-                        .OnDelete(DeleteBehavior.Cascade); 
+                        .OnDelete(DeleteBehavior.Cascade);
             modelBuilder.Entity<Favorite>()
-                       .HasOne<Articles>(f => f.Article)
+                       .HasOne(f => f.Article)
                        .WithMany(a => a.FavouredBy)
                        .HasForeignKey(f => f.ArticleId)
                        .OnDelete(DeleteBehavior.Cascade);
@@ -57,7 +57,7 @@ namespace WebApplication1.DataAccess
             modelBuilder.Entity<Users>()
                         .HasOne(u => u.RefreshToken)
                         .WithOne(t => t.User)
-                        .HasForeignKey<RefreshTokens>(t=>t.UserId);
+                        .HasForeignKey<RefreshTokens>(t => t.UserId);
         }
     }
 }

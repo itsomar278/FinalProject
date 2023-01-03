@@ -1,8 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models.Entites;
+﻿using DataAcess;
+using DataAcess.Entites;
+using DataAcess.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 
-namespace WebApplication1.DataAccess.Repositories.ArticleRepository
+namespace DataAcess.Repositories.ArticleRepository
 {
     public class ArticleRepository : Repository<Articles>, IArticleRepository
     {
@@ -16,14 +18,14 @@ namespace WebApplication1.DataAccess.Repositories.ArticleRepository
 
             if (!string.IsNullOrEmpty(title))
                 articles = articles.Where(a => a.Title.Contains(title));
-            
+
             if (!string.IsNullOrEmpty(searchQuery))
                 articles = articles.Where(a => a.Content.Contains(searchQuery));
-            
+
             articles = articles.OrderBy(a => a.Title)
                               .Skip(pageSize * (pageNumber - 1))
                               .Take(pageSize);
-                            
+
             return await articles.ToListAsync();
         }
     }

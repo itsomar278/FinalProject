@@ -1,17 +1,12 @@
 ﻿using AutoMapper;
+using DataAcess.Entites;
+using DataAcess.UnitOfWorks;
+using Domain.Exceptions;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.DTO_s.ResponseDto_s;
-using Domain.Models.Requests;
-using Domain.Services.ArticleService;
-using FinalProject.DL.Exceptions;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using System.Web.Http.ModelBinding;
-using WebApplication1.DataAccess.UnitOfWorks;
-using WebApplication1.Models;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
 
 namespace Domain.Services.ArticleService
 {

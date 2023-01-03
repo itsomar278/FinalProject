@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
+using DataAcess.Entites;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.DTO_s.ResponseDto_s;
-using WebApplication1.Models;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
+using WebApplication1.Requests;
+using WebApplication1.Response;
 
 namespace WebApplication1.Mapping
 {

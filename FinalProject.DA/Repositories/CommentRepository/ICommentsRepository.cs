@@ -1,6 +1,6 @@
-﻿using WebApplication1.Models.Entites;
+﻿using DataAcess.Entites;
 
-namespace WebApplication1.DataAccess.Repositories.CommentRepository
+namespace DataAcess.Repositories.CommentRepository
 {
     public interface ICommentsRepository : IRepository<Comments>
     {

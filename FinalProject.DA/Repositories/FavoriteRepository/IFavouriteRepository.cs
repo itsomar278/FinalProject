@@ -1,8 +1,9 @@
-﻿using WebApplication1.Models.Entites;
+﻿using DataAcess.Entites;
+using DataAcess.Repositories;
 
-namespace WebApplication1.DataAccess.Repositories.FavoriteRepository
+namespace DataAcess.Repositories.FavoriteRepository
 {
     public interface IFavouriteRepository : IRepository<Favorite>
-    { 
+    {
     }
 }

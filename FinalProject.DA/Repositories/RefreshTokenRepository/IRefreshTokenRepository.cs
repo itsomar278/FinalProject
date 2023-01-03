@@ -1,6 +1,7 @@
-﻿using WebApplication1.Models.Entites;
+﻿using DataAcess.Entites;
+using DataAcess.Repositories;
 
-namespace WebApplication1.DataAccess.Repositories.RefreshTokenRepository
+namespace DataAcess.Repositories.RefreshTokenRepository
 {
     public interface IRefreshTokenRepository : IRepository<RefreshTokens>
     {

@@ -1,14 +1,13 @@
 ﻿
 using AutoMapper;
 using Domain.Models.DTO_s.RequestDto_s;
-using Domain.Models.Requests;
 using Domain.Services.ArticleService;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
-using WebApplication1.Services.Session;
+using WebApplication1.Requests;
+using WebApplication1.Response;
 
 namespace WebApplication1.Controllers
 {
@@ -33,6 +32,7 @@ namespace WebApplication1.Controllers
             var user = _sessionDataManagment.GetUserFromSession();
             var RequestDto = _mapper.Map<ArticlePostRequestDto>(request);
             await _articleService.PostArticle(RequestDto, user);
+
             return Ok("article posted !");
         }
 

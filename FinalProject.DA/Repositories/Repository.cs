@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace WebApplication1.DataAccess.Repositories
+namespace DataAcess.Repositories
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
@@ -22,9 +22,9 @@ namespace WebApplication1.DataAccess.Repositories
         {
             return await _DbContext.Set<TEntity>().Where(predicate).ToListAsync();
         }
-        public virtual async Task<TEntity> GetAsync((int, int) id )
+        public virtual async Task<TEntity> GetAsync((int, int) id)
         {
-            return await _DbContext.Set<TEntity>().FindAsync(id.Item1 , id.Item2);
+            return await _DbContext.Set<TEntity>().FindAsync(id.Item1, id.Item2);
         }
         public virtual async Task<TEntity> GetAsync(int id)
         {

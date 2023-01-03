@@ -1,5 +1,4 @@
 ﻿using Domain.Exceptions;
-using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -11,7 +10,7 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinalProject.DL
+namespace Domain
 {
     public class MyExceptionFilter : IExceptionFilter
     {

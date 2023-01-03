@@ -1,17 +1,12 @@
 ﻿using AutoMapper;
 using Domain.Models.DTO_s.RequestDto_s;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebApplication1.Models.Requests;
+using WebApplication1.Requests;
 
-namespace Domain.Mapping
+namespace WebApplication1.Mapping
 {
     public class AuthProfile : Profile
     {
-        public AuthProfile() 
+        public AuthProfile()
         {
             CreateMap<UserRegisterRequest, UserRegisterRequestDto>()
                   .ForMember(r => r.UserEmail, m => m.MapFrom(source => source.UserEmail))

@@ -1,14 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
-using WebApplication1.Models;
 using Domain.Models.DTO_s.ResponseDto_s;
 using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Services.SessionService;
 
 namespace Domain.Services.CommentService
 {

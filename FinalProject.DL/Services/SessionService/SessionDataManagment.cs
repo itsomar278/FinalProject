@@ -1,18 +1,16 @@
 ﻿using AutoMapper;
+using DataAcess.UnitOfWorks;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using WebApplication1.DataAccess.UnitOfWorks;
-using WebApplication1.Models;
 
-
-namespace WebApplication1.Services.Session
+namespace Domain.Services.SessionService
 {
     public class SessionDataManagment : ISessionDataManagment
     {
-        private readonly IHttpContextAccessor _httpContextAccessor ;
-        private readonly IMapper _mapper ;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
-        public SessionDataManagment(IHttpContextAccessor httpContextAccessor , IMapper mapper , IUnitOfWork unitOfWork )
+        public SessionDataManagment(IHttpContextAccessor httpContextAccessor, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _httpContextAccessor = httpContextAccessor;
             _mapper = mapper;
@@ -28,7 +26,7 @@ namespace WebApplication1.Services.Session
             }
 
             return null;
-            
+
         }
         public async Task StoreUserInSession(string userEmail)
         {
@@ -37,5 +35,6 @@ namespace WebApplication1.Services.Session
             string userJson = JsonConvert.SerializeObject(userInSession);
             _httpContextAccessor.HttpContext.Session.SetString("MyUser", userJson);
         }
+
     }
 }

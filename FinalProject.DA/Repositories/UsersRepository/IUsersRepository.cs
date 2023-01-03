@@ -1,8 +1,9 @@
-﻿using System.Linq.Expressions;
+﻿using DataAcess.Entites;
+using DataAcess.Repositories;
+using System.Linq.Expressions;
 using System.Security.Claims;
-using WebApplication1.Models.Entites;
 
-namespace WebApplication1.DataAccess.Repositories.UsersRepository
+namespace DataAcess.Repositories.UsersRepository
 {
     public interface IUsersRepository : IRepository<Users>
     {

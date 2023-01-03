@@ -1,15 +1,11 @@
 ﻿using AutoMapper;
 using Domain.Models.DTO_s.RequestDto_s;
-using Domain.Models.Requests;
+using Domain.Services.SessionService;
 using Domain.Services.UsersService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using WebApplication1.DataAccess.UnitOfWorks;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
-using WebApplication1.Services.AuthService;
-using WebApplication1.Services.Session;
+using WebApplication1.Requests;
+using WebApplication1.Response;
 
 namespace WebApplication1.Controllers
 {
@@ -112,6 +108,7 @@ namespace WebApplication1.Controllers
         {
             var pagingRequestDto = _mapper.Map<PagingRequestDto>(pagingRequest);
             var favoriteArticles = await _userService.GetFavoriteArticles(userId, pagingRequestDto);
+
             if (favoriteArticles.Count() == 0)
                 return Ok("User has no favorite articles yet ");
 

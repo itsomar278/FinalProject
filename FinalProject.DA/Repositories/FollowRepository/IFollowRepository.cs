@@ -1,12 +1,13 @@
-﻿using System.Xml.Serialization;
-using WebApplication1.Models.Entites;
+﻿using DataAcess.Entites;
+using DataAcess.Repositories;
+using System.Xml.Serialization;
 
-namespace WebApplication1.DataAccess.Repositories.FollowRepository
+namespace DataAcess.Repositories.FollowRepository
 {
     public interface IFollowRepository : IRepository<Follow>
     {
         public Task<List<int>> GetAllFollowersIdAsync(int userId);
         public Task<List<int>> GetAllFollowingId(int userId);
-        public void FollowUser(int userId , int userToFollowId);
+        public void FollowUser(int userId, int userToFollowId);
     }
 }

@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
+using DataAcess.Entites;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Services.CommentService;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
-using WebApplication1.Services.Session;
+using WebApplication1.Requests;
+using WebApplication1.Response;
 
 namespace WebApplication1.Controllers
 {
@@ -29,11 +28,12 @@ namespace WebApplication1.Controllers
         public async Task<ActionResult<CommentResponse>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
             var responsesDtos = await _commentsService.GetCommentsOnArticle(articleId);
+
             if (responsesDtos.Count() == 0)
-            {
                 return Ok("there is no comments on this article");
-            }
+            
             var responses = _mapper.Map<List<CommentResponse>>(responsesDtos);
+
             return Ok(responses);
         }
 

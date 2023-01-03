@@ -1,4 +1,4 @@
-﻿namespace WebApplication1.Models
+﻿namespace Domain.Services.SessionService
 {
     public class UserSessionModel
     {

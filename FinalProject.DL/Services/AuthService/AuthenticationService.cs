@@ -1,18 +1,17 @@
 ﻿using AutoMapper;
+using DataAcess.Entites;
+using DataAcess.UnitOfWorks;
 using Domain.Exceptions;
 using Domain.Models.DTO_s.RequestDto_s;
-using FinalProject.DL.Exceptions;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
-using WebApplication1.DataAccess.UnitOfWorks;
-using WebApplication1.Models;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
 
-namespace WebApplication1.Services.AuthService
+
+namespace Domain.Services.AuthService
 {
     public class AuthenticationService : IAuthenticationService
     {
@@ -79,10 +78,10 @@ namespace WebApplication1.Services.AuthService
         }
         public async Task<ActionResult> Register(UserRegisterRequestDto request)
         {
-            if ((await _unitOfWork.Users.DoesExistAsync(u => u.UserEmail == request.UserEmail)) ||
-                (await _unitOfWork.Users.DoesExistAsync(u => u.UserName == request.UserName)))
+            if (await _unitOfWork.Users.DoesExistAsync(u => u.UserEmail == request.UserEmail) ||
+                await _unitOfWork.Users.DoesExistAsync(u => u.UserName == request.UserName))
             {
-                throw new AlreadyExistingRecordException("Email or User Name has been used before"); 
+                throw new AlreadyExistingRecordException("Email or User Name has been used before");
             }
 
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -96,11 +95,11 @@ namespace WebApplication1.Services.AuthService
         {
             if (!await _unitOfWork.Users.DoesExistAsync(u => u.UserEmail == request.UserEmail))
                 throw new RecordNotFoundException("There is no user with such email address");
-            
+
 
             var userResult = await _unitOfWork.Users.FindByEmailAsync(request.UserEmail);
-            if (!(await VerifyPasswordHash(request.Password, userResult.PasswordHash, userResult.PasswordSalt)))
-                throw new UnauthorizedUserException("wrong passowrd !!!!!");    
+            if (!await VerifyPasswordHash(request.Password, userResult.PasswordHash, userResult.PasswordSalt))
+                throw new UnauthorizedUserException("wrong passowrd !!!!!");
 
             var refreshTokenResult = await _unitOfWork.RefreshTokens.FindAsync(t => t.UserId == userResult.UserId);
 
@@ -166,7 +165,6 @@ namespace WebApplication1.Services.AuthService
             if (user == null)
                 throw new RecordNotFoundException("There is no user with such email address");
 
-
             if (sessionUser == null)
                 throw new UnauthorizedUserException("you need to re-login");
 
@@ -185,17 +183,19 @@ namespace WebApplication1.Services.AuthService
         public async Task UpdateUserRefreshToken(string userEmail, RefreshTokens refreshToken)
         {
             var userResult = await _unitOfWork.Users.FindByEmailAsync(userEmail);
+
             if (await _unitOfWork.RefreshTokens.DoesExistAsync(rt => rt.UserId == userResult.UserId))
             {
                 var refreshTokenToDelete = await _unitOfWork.RefreshTokens.FindAsync(rt => rt.UserId == userResult.UserId);
                 _unitOfWork.RefreshTokens.RemoveRange(refreshTokenToDelete);
                 await _unitOfWork.complete();
             }
+
             _unitOfWork.RefreshTokens.AddAsync(refreshToken);
             await _unitOfWork.complete();
+
             _unitOfWork.Users.UpdateUserRefreshToken(userResult.UserId, refreshToken.TokenId);
             await _unitOfWork.complete();
-
         }
         public async Task DeleteUserRefreshToken(string userEmail)
         {

@@ -1,11 +1,11 @@
-﻿using WebApplication1.DataAccess.Repositories.ArticleRepository;
-using WebApplication1.DataAccess.Repositories.CommentRepository;
-using WebApplication1.DataAccess.Repositories.FavoriteRepository;
-using WebApplication1.DataAccess.Repositories.FollowRepository;
-using WebApplication1.DataAccess.Repositories.RefreshTokenRepository;
-using WebApplication1.DataAccess.Repositories.UsersRepository;
+﻿using DataAcess.Repositories.ArticleRepository;
+using DataAcess.Repositories.CommentRepository;
+using DataAcess.Repositories.FavoriteRepository;
+using DataAcess.Repositories.FollowRepository;
+using DataAcess.Repositories.RefreshTokenRepository;
+using DataAcess.Repositories.UsersRepository;
 
-namespace WebApplication1.DataAccess.UnitOfWorks
+namespace DataAcess.UnitOfWorks
 {
     public interface IUnitOfWork : IAsyncDisposable
     {

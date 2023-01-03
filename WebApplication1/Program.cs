@@ -1,7 +1,18 @@
+using DataAcess;
+using DataAcess.Repositories;
+using DataAcess.Repositories.ArticleRepository;
+using DataAcess.Repositories.CommentRepository;
+using DataAcess.Repositories.FavoriteRepository;
+using DataAcess.Repositories.FollowRepository;
+using DataAcess.Repositories.RefreshTokenRepository;
+using DataAcess.Repositories.UsersRepository;
+using DataAcess.UnitOfWorks;
+using Domain;
 using Domain.Services.ArticleService;
+using Domain.Services.AuthService;
 using Domain.Services.CommentService;
+using Domain.Services.SessionService;
 using Domain.Services.UsersService;
-using FinalProject.DL;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -9,18 +20,7 @@ using Microsoft.OpenApi.Models;
 using Serilog;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text.Json.Serialization;
-using WebApplication1.DataAccess;
-using WebApplication1.DataAccess.Repositories;
-using WebApplication1.DataAccess.Repositories.ArticleRepository;
-using WebApplication1.DataAccess.Repositories.CommentRepository;
-using WebApplication1.DataAccess.Repositories.FavoriteRepository;
-using WebApplication1.DataAccess.Repositories.FollowRepository;
-using WebApplication1.DataAccess.Repositories.RefreshTokenRepository;
-using WebApplication1.DataAccess.Repositories.UsersRepository;
-using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Mapping;
-using WebApplication1.Services.AuthService;
-using WebApplication1.Services.Session;
 
 namespace WebApplication1
 {
@@ -44,7 +44,7 @@ namespace WebApplication1
                 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen();
-                builder.Services.AddAutoMapper(typeof(ArticlesProfile), typeof(CommentsProfile), typeof(UsersProfile));
+                builder.Services.AddAutoMapper(typeof(ArticlesProfile), typeof(CommentsProfile), typeof(UsersProfile) ,typeof(AuthProfile));
                 builder.Services.AddDbContext<ProjectDbContext>(options =>
                     options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly("FinalProject.DAL")));
                 builder.Services.AddTransient(typeof(IRepository<>), typeof(Repository<>));

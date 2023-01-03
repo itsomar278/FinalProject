@@ -2,13 +2,13 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace WebApplication1.Models.Entites
+namespace DataAcess.Entites
 {
     public class RefreshTokens
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int TokenId { get; set; } 
+        public int TokenId { get; set; }
         [Required]
         public string Token { get; set; } = string.Empty;
         [Required]

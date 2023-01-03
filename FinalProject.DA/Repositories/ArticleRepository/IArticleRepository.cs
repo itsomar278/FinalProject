@@ -1,9 +1,10 @@
-﻿using WebApplication1.Models.Entites;
+﻿using DataAcess.Entites;
+using DataAcess.Repositories;
 
-namespace WebApplication1.DataAccess.Repositories.ArticleRepository
+namespace DataAcess.Repositories.ArticleRepository
 {
     public interface IArticleRepository : IRepository<Articles>
     {
-       Task<IEnumerable<Articles>> GetArticlesAsync(string? title, string? searchQuery , int pageNumber , int pageSize);
-    } 
+        Task<IEnumerable<Articles>> GetArticlesAsync(string? title, string? searchQuery, int pageNumber, int pageSize);
+    }
 }

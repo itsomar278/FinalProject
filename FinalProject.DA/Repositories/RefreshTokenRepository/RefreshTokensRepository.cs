@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models.Entites;
+﻿using DataAcess.Entites;
+using Microsoft.EntityFrameworkCore;
 
-namespace WebApplication1.DataAccess.Repositories.RefreshTokenRepository
+namespace DataAcess.Repositories.RefreshTokenRepository
 {
     public class RefreshTokensRepository : Repository<RefreshTokens>, IRefreshTokenRepository
     {

@@ -1,15 +1,12 @@
 ﻿using AutoMapper;
+using DataAcess.Entites;
+using DataAcess.UnitOfWorks;
 using Domain.Exceptions;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.DTO_s.ResponseDto_s;
-using Domain.Models.Requests;
-using FinalProject.DL.Exceptions;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.DataAccess.UnitOfWorks;
-using WebApplication1.Models;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
-using WebApplication1.Models.Response;
+
 
 
 namespace Domain.Services.UsersService

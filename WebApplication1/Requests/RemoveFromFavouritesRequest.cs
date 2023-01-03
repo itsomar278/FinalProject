@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebApplication1.Models.Requests
+namespace WebApplication1.Requests
 {
     public class RemoveFromFavouritesRequest
     {

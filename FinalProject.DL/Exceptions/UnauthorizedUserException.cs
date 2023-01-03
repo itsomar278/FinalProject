@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FinalProject.DL.Exceptions
+namespace Domain.Exceptions
 {
-    public class UnauthorizedUserException: Exception 
+    public class UnauthorizedUserException : Exception
     {
         public UnauthorizedUserException(string message) : base(message)
         {

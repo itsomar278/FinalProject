@@ -1,10 +1,9 @@
-﻿using Domain.Models.DTO_s.RequestDto_s;
+﻿using DataAcess.Entites;
+using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Services.SessionService;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Models;
-using WebApplication1.Models.Entites;
-using WebApplication1.Models.Requests;
 
-namespace WebApplication1.Services.AuthService
+namespace Domain.Services.AuthService
 {
     public interface IAuthenticationService
     {
@@ -15,7 +14,7 @@ namespace WebApplication1.Services.AuthService
         Task<string> login(UserLoginRequestDto request);
         Task<ActionResult> logout(UserSessionModel user);
         Task<ActionResult> Register(UserRegisterRequestDto request);
-        Task<ActionResult> UpdatePassword(UserPasswordUpdateRequestDto request , UserSessionModel user);
+        Task<ActionResult> UpdatePassword(UserPasswordUpdateRequestDto request, UserSessionModel user);
         Task<ActionResult> UpdateUserName(UpdateUserNameRequestDto request, UserSessionModel user);
         Task<RefreshTokens> GenerateRefreshToken(string email);
         Task UpdateUserRefreshToken(string userEmail, RefreshTokens refreshToken);

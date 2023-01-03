@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DataAcess.Entites;
+using Microsoft.EntityFrameworkCore;
 using System;
-using WebApplication1.Models.Entites;
 
-namespace WebApplication1.DataAccess.Repositories.FollowRepository
+namespace DataAcess.Repositories.FollowRepository
 {
     public class FollowRepository : Repository<Follow>, IFollowRepository
     {
@@ -26,7 +26,7 @@ namespace WebApplication1.DataAccess.Repositories.FollowRepository
                     .Select(f => f.FollowerId)
                     .ToListAsync();
         }
-        public async  Task<List<int>> GetAllFollowingId(int userId)
+        public async Task<List<int>> GetAllFollowingId(int userId)
         {
             return await _DbContext.Set<Follow>()
                    .Where(f => f.FollowerId == userId)
