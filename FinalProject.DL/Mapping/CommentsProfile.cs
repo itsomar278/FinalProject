@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Models.DTO_s.ResponseDto_s;
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
@@ -10,9 +12,12 @@ namespace WebApplication1.Mapping
     {
         public CommentsProfile()
         {
-            CreateMap<(Comments comment, Users user), CommentResponse>()
+            CreateMap<(Comments comment, Users user), CommentResponseDto>()
             .ForMember(cr => cr.UserName, m => m.MapFrom(source => source.user.UserName))
             .ForMember(cr => cr.CommentContent, m => m.MapFrom(source => source.comment.CommentContent));
+
+            CreateMap<CommentResponseDto, CommentResponse>();
+            CreateMap<CommentPostRequest, CommentPostRequestDto>();
         }
 
     }

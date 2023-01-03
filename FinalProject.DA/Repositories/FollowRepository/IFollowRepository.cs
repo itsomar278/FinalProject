@@ -5,8 +5,8 @@ namespace WebApplication1.DataAccess.Repositories.FollowRepository
 {
     public interface IFollowRepository : IRepository<Follow>
     {
-        public List<int> GetAllFollowersId(int userId);
-        public List<int> GetAllFollowingId(int userId);
+        public Task<List<int>> GetAllFollowersIdAsync(int userId);
+        public Task<List<int>> GetAllFollowingId(int userId);
         public void FollowUser(int userId , int userToFollowId);
     }
 }

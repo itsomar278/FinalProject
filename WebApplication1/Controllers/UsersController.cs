@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
+using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.Requests;
 using Domain.Services.UsersService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using WebApplication1.DataAccess.UnitOfWorks;
 using WebApplication1.Models.Requests;
 using WebApplication1.Models.Response;
@@ -18,42 +20,49 @@ namespace WebApplication1.Controllers
 
         private readonly ISessionDataManagment _sessionDataManagment;
         private readonly IUserService _userService;
+        private readonly IMapper _mapper;
         const int maxUsersPageSize = 7;
-        public UsersController(ISessionDataManagment sessionDataManagment, IUserService userService)
+        public UsersController(ISessionDataManagment sessionDataManagment, IUserService userService, IMapper mapper)
         {
             _sessionDataManagment = sessionDataManagment;
             _userService = userService;
+            _mapper = mapper;
         }
 
         [HttpGet, Authorize]
-        public async Task<ActionResult<UsersResponse>> GetUsers([FromQuery] UserSearchRequest userSearchRequest) // create request for these params
+        public async Task<ActionResult<UsersResponse>> GetUsers([FromQuery] UserSearchRequest userSearchRequest)
         {
             if (userSearchRequest.pageSize > maxUsersPageSize)
                 userSearchRequest.pageSize = maxUsersPageSize;
 
-            var users = await _userService.GetUsers(userSearchRequest);
+            var requestDto = _mapper.Map<UserSearchRequestDto>(userSearchRequest);
+            var usersDto = await _userService.GetUsers(requestDto);
 
-            if (users.Count() == 0)
+            if (usersDto.Count() == 0)
                 return NotFound("there is no users registered yet !");
 
+            var users = _mapper.Map<IEnumerable<UsersResponse>>(usersDto);
             return Ok(users);
         }
 
         [HttpGet("{UserId}"), Authorize]
         public async Task<ActionResult<UsersResponse>> GetUser([FromRoute(Name = "UserId")] int userId)
         {
-            var userResponse = await _userService.GetUser(userId);
-            return Ok(userResponse);
+            var userResponseDto = await _userService.GetUser(userId);
+            var response = _mapper.Map<UsersResponse>(userResponseDto);
+
+            return Ok(response);
         }
 
         [HttpGet("{UserId}/followers"), Authorize]
         public async Task<ActionResult<UsersResponse>> GetFollowers([FromRoute(Name = "UserId")] int userId)
         {
-            var userResponses = await _userService.GetFollowers(userId);
+            var userResponsesDto = await _userService.GetFollowers(userId);
 
-            if (userResponses.Count() == 0)
+            if (userResponsesDto.Count() == 0)
                 return Ok("user have 0 followers");
 
+            var userResponses = _mapper.Map<IEnumerable<UsersResponse>>(userResponsesDto);
             return Ok(userResponses);
         }
 

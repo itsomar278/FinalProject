@@ -7,9 +7,6 @@ namespace WebApplication1.DataAccess.Repositories.CommentRepository
         public CommentsRepository(ProjectDbContext projectDbContext) : base(projectDbContext)
         {
         }
-        public ProjectDbContext projectDbContext
-        {
-            get { return _DbContext as ProjectDbContext; }
-        }
+      
     }
 }

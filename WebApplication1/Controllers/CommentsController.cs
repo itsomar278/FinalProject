@@ -1,4 +1,6 @@
-﻿using Domain.Services.CommentService;
+﻿using AutoMapper;
+using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Services.CommentService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -15,21 +17,23 @@ namespace WebApplication1.Controllers
     {
         private readonly ISessionDataManagment _sessionDataManagment;
         private readonly ICommentsService _commentsService;
-        public CommentsController(ISessionDataManagment sessionDataManagment, ICommentsService commentsService)
+        private readonly IMapper _mapper;
+        public CommentsController(ISessionDataManagment sessionDataManagment, ICommentsService commentsService, IMapper Mapper)
         {
             _sessionDataManagment = sessionDataManagment;
             _commentsService = commentsService;
+            _mapper = Mapper;
         }
 
         [HttpGet("{ArticleId}/Comments")]
         public async Task<ActionResult<CommentResponse>> GetCommentsOnArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
-            var responses = await _commentsService.GetCommentsOnArticle(articleId);
-            if (responses.Count() == 0)
+            var responsesDtos = await _commentsService.GetCommentsOnArticle(articleId);
+            if (responsesDtos.Count() == 0)
             {
                 return Ok("there is no comments on this article");
             }
-
+            var responses = _mapper.Map<List<CommentResponse>>(responsesDtos);
             return Ok(responses);
         }
 
@@ -42,19 +46,20 @@ namespace WebApplication1.Controllers
         }
 
         [HttpPost("{ArticleId}/Comments"), Authorize]
-        public async Task<ActionResult<Articles>> PostComment(CommentRequest request, [FromRoute(Name = "ArticleId")] int articleId)
+        public async Task<ActionResult<Articles>> PostComment(CommentPostRequest request, [FromRoute(Name = "ArticleId")] int articleId)
         {
             var user = _sessionDataManagment.GetUserFromSession();
-            await _commentsService.PostComment(articleId, user, request);
+            var requestDto = _mapper.Map<CommentPostRequestDto>(request);
+            await _commentsService.PostComment(articleId, user, requestDto);
 
             return Ok("comment successfully posted");
         }
 
         [HttpDelete("{ArticleId}/Comments"), Authorize]
-        public async Task<ActionResult> DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, CommentDeleteRequest request)
+        public async Task<ActionResult> DeleteCommentOnArticle([FromRoute(Name = "ArticleId")] int articleId, int commentId)
         {
             var user = _sessionDataManagment.GetUserFromSession();
-            await _commentsService.DeleteCommentOnArticle(articleId, user, request);
+            await _commentsService.DeleteCommentOnArticle(articleId, user, commentId);
 
             return Ok("comment deleted successfully");
         }

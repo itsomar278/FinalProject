@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
 using WebApplication1.Models.Entites;
 
 namespace WebApplication1.DataAccess.Repositories.FollowRepository
@@ -8,10 +9,7 @@ namespace WebApplication1.DataAccess.Repositories.FollowRepository
         public FollowRepository(ProjectDbContext projectDbContext) : base(projectDbContext)
         {
         }
-        public ProjectDbContext projectDbContext
-        {
-            get { return _DbContext as ProjectDbContext; }
-        }
+
         public void FollowUser(int userId, int userToFollowId)
         {
             Follow follow = new Follow
@@ -21,25 +19,19 @@ namespace WebApplication1.DataAccess.Repositories.FollowRepository
             };
             AddAsync(follow);
         }
-        public List<int> GetAllFollowersId(int userId)
+        public async Task<List<int>> GetAllFollowersIdAsync(int userId)
         {
-            List<int> followersId = new List<int>();
-             var followers =_DbContext.Set<Follow>().Where(f =>f.FollowedId == userId);
-            foreach (var f in followers)
-            {
-                followersId.Add(f.FollowerId);
-            }
-            return followersId;
+            return await _DbContext.Set<Follow>()
+                    .Where(f => f.FollowedId == userId)
+                    .Select(f => f.FollowerId)
+                    .ToListAsync();
         }
-        public List<int> GetAllFollowingId(int userId)
+        public async  Task<List<int>> GetAllFollowingId(int userId)
         {
-            List<int> followingId = new List<int>();
-            var followers = _DbContext.Set<Follow>().Where(f => f.FollowerId == userId);
-            foreach (var f in followers)
-            {
-                followingId.Add(f.FollowedId);
-            }
-            return followingId;
+            return await _DbContext.Set<Follow>()
+                   .Where(f => f.FollowerId == userId)
+                   .Select(f => f.FollowedId)
+                   .ToListAsync();
         }
     }
 }

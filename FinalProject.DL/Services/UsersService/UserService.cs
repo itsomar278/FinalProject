@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Exceptions;
+using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Models.DTO_s.ResponseDto_s;
 using Domain.Models.Requests;
 using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.Mvc;
@@ -22,52 +24,53 @@ namespace Domain.Services.UsersService
             _mapper = mapper;
         }
 
-        public async Task<IEnumerable<UsersResponse>> GetUsers(UserSearchRequest userSearchRequest )
+        public async Task<IEnumerable<UserResponseDto>> GetUsers(UserSearchRequestDto userSearchRequest )
         {
             var users = await _unitOfWork.Users.GetUsersAsync(userSearchRequest.searchQuery, userSearchRequest.pageNumber, userSearchRequest.pageSize);
-            var usersResponses = _mapper.Map<List<UsersResponse>>(users);
+            var usersResponses = _mapper.Map<List<UserResponseDto>>(users);
 
             return await Task.FromResult(usersResponses);
         }
-        public async Task<UsersResponse> GetUser(int userId)
+        public async Task<UserResponseDto> GetUser(int userId)
         {
             if (!await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId))
                 throw new RecordNotFoundException("cannot find the specified user");
 
             var user = await _unitOfWork.Users.GetAsync(userId);
-            var userResponse = _mapper.Map<UsersResponse>(user);
+            var userResponse = _mapper.Map<UserResponseDto>(user);
 
             return await Task.FromResult(userResponse);
         }
-        public async Task<IEnumerable<UsersResponse>> GetFollowers(int userId)
+        public async Task<IEnumerable<UserResponseDto>> GetFollowers(int userId)
         {
             if (!await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId))
                 throw new RecordNotFoundException("Cannot find the specified user");
 
-            var followersId = _unitOfWork.Follows.GetAllFollowersId(userId);
-            List<UsersResponse> usersResponses = new List<UsersResponse>();
+            var followersId = await _unitOfWork.Follows.GetAllFollowersIdAsync(userId);
+            List<UserResponseDto> usersResponses = new List<UserResponseDto>();
+
 
             foreach (int id in followersId)
             {
                 var follower = await _unitOfWork.Users.GetAsync(id);
-                var response = _mapper.Map<UsersResponse>(follower);
+                var response = _mapper.Map<UserResponseDto>(follower);
                 usersResponses.Add(response);
             }
 
             return await Task.FromResult(usersResponses);
         }
-        public async Task<IEnumerable<UsersResponse>> GetFollowing(int userId)
+        public async Task<IEnumerable<UserResponseDto>> GetFollowing(int userId)
         {
             if (!await _unitOfWork.Users.DoesExistAsync(u => u.UserId == userId))
                 throw new RecordNotFoundException("cannot find the specified user");
 
-            var followingId = _unitOfWork.Follows.GetAllFollowingId(userId);
-            List<UsersResponse> usersResponses = new List<UsersResponse>();
+            var followingId = await _unitOfWork.Follows.GetAllFollowingId(userId);
+            List<UserResponseDto> usersResponses = new List<UserResponseDto>();
 
             foreach (int id in followingId)
             {
                 var followed = await _unitOfWork.Users.GetAsync(id);
-                var response = _mapper.Map<UsersResponse>(followed);
+                var response = _mapper.Map<UserResponseDto>(followed);
                 usersResponses.Add(response);
             }
 

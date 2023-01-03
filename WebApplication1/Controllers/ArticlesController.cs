@@ -1,4 +1,6 @@
 ﻿
+using AutoMapper;
+using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.Requests;
 using Domain.Services.ArticleService;
 using Microsoft.AspNetCore.Authorization;
@@ -16,42 +18,48 @@ namespace WebApplication1.Controllers
     {
         private readonly ISessionDataManagment _sessionDataManagment;
         private readonly IArticleService _articleService;
+        private readonly IMapper _mapper;
         const int maxArticlesPageSize = 5;
-        public ArticlesController( ISessionDataManagment sessionDataManagment, IArticleService articleService)
+        public ArticlesController( ISessionDataManagment sessionDataManagment, IArticleService articleService , IMapper mapper)
         {
             _sessionDataManagment = sessionDataManagment;
             _articleService = articleService;
+            _mapper = mapper;
         }
 
         [HttpPost, Authorize]
         public async Task<ActionResult> PostArticle(ArticlePostRequest request)
         {
             var user = _sessionDataManagment.GetUserFromSession();
-            await _articleService.PostArticle(request, user);
+            var RequestDto = _mapper.Map<ArticlePostRequestDto>(request);
+            await _articleService.PostArticle(RequestDto, user);
             return Ok("article posted !");
         }
 
         [HttpGet]
-        public async Task<ActionResult<ArticleResponse>> GetArticles([FromQuery] ArticlesSearchRequest articlesSearchRequest) // create request contains these params 
+        public async Task<ActionResult<ArticleResponse>> GetArticles([FromQuery] ArticlesSearchRequest articlesSearchRequest) 
         {
             if (articlesSearchRequest.pageSize > maxArticlesPageSize)
             {
                 articlesSearchRequest.pageSize = maxArticlesPageSize;
             }
+            var articlesSearchRequestDto = _mapper.Map<ArticlesSearchRequestDto>(articlesSearchRequest);
 
-            var articles = await _articleService.GetArticles(articlesSearchRequest);
-            if (articles.Count() == 0)
+            var articlesResponseDtos = await _articleService.GetArticles(articlesSearchRequestDto);
+            if (articlesResponseDtos.Count() == 0)
             {
                 return Ok("no articles posted yet");
             }
 
-            return Ok(articles);
+            var response = _mapper.Map<List<ArticleResponse>>(articlesResponseDtos);
+            return Ok(response);
         }
 
         [HttpGet("{ArticleId}")]
         public async Task<ActionResult<ArticleResponse>> GetArticle([FromRoute(Name = "ArticleId")] int articleId)
         {
-            var response = await _articleService.GetArticle(articleId);
+            var articleDto = await _articleService.GetArticle(articleId);
+            var response = _mapper.Map<ArticleResponse>(articleDto);
             return Ok(response);
         }
 
@@ -68,7 +76,10 @@ namespace WebApplication1.Controllers
             , JsonPatchDocument<ArticlePostRequest> patchDocument)
         {
             var user = _sessionDataManagment.GetUserFromSession();
-            await _articleService.ArticlePartialUpdate(articleId, patchDocument , user);
+
+            var documentDto = _mapper.Map<JsonPatchDocument<ArticlePostRequestDto>>(patchDocument);
+
+            await _articleService.ArticlePartialUpdate(articleId, documentDto, user);
 
             return Ok("Article successfully updated");
         }

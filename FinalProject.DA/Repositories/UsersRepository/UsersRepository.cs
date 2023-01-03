@@ -10,10 +10,7 @@ namespace WebApplication1.DataAccess.Repositories.UsersRepository
         public UsersRepository(ProjectDbContext projectDbContext) : base(projectDbContext)
         {
         }
-        public ProjectDbContext projectDbContext
-        {
-            get { return _DbContext as ProjectDbContext; }
-        }
+       
         public async Task<Users> FindByEmailAsync(string email)
         {
             var user = await _DbContext.Set<Users>().SingleOrDefaultAsync(user => user.UserEmail == email);

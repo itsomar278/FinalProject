@@ -1,4 +1,6 @@
-﻿using Domain.Models.Requests;
+﻿using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Models.DTO_s.ResponseDto_s;
+using Domain.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,10 @@ namespace Domain.Services.UsersService
 {
     public interface IUserService
     {
-        Task<IEnumerable<UsersResponse>> GetUsers(UserSearchRequest userSearchRequest);
-        Task<UsersResponse> GetUser(int userId);
-        Task<IEnumerable<UsersResponse>> GetFollowers(int userId);
-        Task<IEnumerable<UsersResponse>> GetFollowing(int userId);
+        Task<IEnumerable<UserResponseDto>> GetUsers(UserSearchRequestDto userSearchRequest);
+        Task<UserResponseDto> GetUser(int userId);
+        Task<IEnumerable<UserResponseDto>> GetFollowers(int userId);
+        Task<IEnumerable<UserResponseDto>> GetFollowing(int userId);
         Task<ActionResult> Follow(int userId, FollowRequest followRequest, UserSessionModel sessionUser);
         Task<ActionResult> Unfollow(int userId, int UserToUnfollowId, UserSessionModel sessionUser);
         Task<ActionResult> RemoveFollower(int userId, int UserToRemoveId, UserSessionModel sessionUser);

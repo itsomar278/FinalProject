@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Models.DTO_s.ResponseDto_s;
+using Domain.Models.Requests;
 using WebApplication1.Models;
 using WebApplication1.Models.Entites;
 using WebApplication1.Models.Requests;
@@ -16,7 +19,7 @@ namespace WebApplication1.Mapping
                 .ForMember(u => u.PasswordHash, m => m.MapFrom(source => source.PasswordHash))
                 .ForMember(u => u.PasswordSalt, m => m.MapFrom(source => source.passwordSalt));
 
-            CreateMap<Users, UsersResponse>()
+            CreateMap<Users, UserResponseDto>()
                 .ForMember(ur => ur.UserName, m => m.MapFrom(source => source.UserName))
                 .ForMember(ur => ur.UserEmail, m => m.MapFrom(source => source.UserEmail));
 
@@ -33,6 +36,8 @@ namespace WebApplication1.Mapping
                 .ForMember(us => us.UserEmail, m => m.MapFrom(source => source.UserEmail))
                 .ForMember(us => us.UserId, m => m.MapFrom(source => source.UserId));
 
+            CreateMap<UserSearchRequest, UserSearchRequestDto>();
+            CreateMap<UserResponseDto, UsersResponse>();
         }
     }
 }

@@ -8,9 +8,5 @@ namespace WebApplication1.DataAccess.Repositories.RefreshTokenRepository
         public RefreshTokensRepository(ProjectDbContext dbContext) : base(dbContext)
         {
         }
-        public ProjectDbContext projectDbContext
-        {
-            get { return _DbContext as ProjectDbContext; }
-        }
     }
 }

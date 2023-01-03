@@ -11,6 +11,8 @@ using WebApplication1.Models.Requests;
 using WebApplication1.Models;
 using WebApplication1.Models.Response;
 using WebApplication1.Models.Entites;
+using Domain.Models.DTO_s.ResponseDto_s;
+using Domain.Models.DTO_s.RequestDto_s;
 
 namespace Domain.Services.CommentService
 {
@@ -24,7 +26,7 @@ namespace Domain.Services.CommentService
             _unitOfWork = unitOfWork;
             _mapper = mapper;
         }
-        public async Task<ActionResult> PostComment(int articleId, UserSessionModel user, CommentRequest request)
+        public async Task<ActionResult> PostComment(int articleId, UserSessionModel user, CommentPostRequestDto request)
         {
             if (user is null)
                 throw new UnauthorizedUserException("you need to re-login");
@@ -44,7 +46,7 @@ namespace Domain.Services.CommentService
 
             return await Task.FromResult(new OkResult());
         }
-        public async Task<CommentResponse> GetCommentOnArticle(int articleId, int commentId)
+        public async Task<CommentResponseDto> GetCommentOnArticle(int articleId, int commentId)
         {
             if (!await _unitOfWork.Articles.DoesExistAsync(A => A.ArticleId == articleId))
                 throw new RecordNotFoundException("specified article cannot be found");
@@ -54,12 +56,12 @@ namespace Domain.Services.CommentService
 
             var comment = await _unitOfWork.Comments.GetAsync(commentId);
             var user = await _unitOfWork.Users.GetAsync(comment.UserId);
-            var response = _mapper.Map<CommentResponse>((comment, user));
+            var response = _mapper.Map<CommentResponseDto>((comment, user));
 
             return await Task.FromResult(response);
         }
 
-        public async Task<IEnumerable<CommentResponse>> GetCommentsOnArticle(int articleId)
+        public async Task<IEnumerable<CommentResponseDto>> GetCommentsOnArticle(int articleId)
         {
             if (!await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId))
                 throw new RecordNotFoundException("specified article cannot be found");
@@ -67,20 +69,20 @@ namespace Domain.Services.CommentService
 
             var comments = await _unitOfWork.Comments.FindAsync(c => c.ArticleId == articleId);
             if (comments.Count() == 0)
-                return Enumerable.Empty<CommentResponse>();
+                return Enumerable.Empty<CommentResponseDto>();
 
 
-            List<CommentResponse> responses = new List<CommentResponse>();
+            List<CommentResponseDto> responses = new List<CommentResponseDto>(); // should use select 
             foreach (var comment in comments)
             {
                 var user = await _unitOfWork.Users.GetAsync(comment.UserId);
-                var commentResponse = _mapper.Map<CommentResponse>((comment, user));
+                var commentResponse = _mapper.Map<CommentResponseDto>((comment, user));
                 responses.Add(commentResponse);
             }
 
             return await Task.FromResult(responses);
         }
-        public async Task<ActionResult> DeleteCommentOnArticle(int articleId, UserSessionModel user, CommentDeleteRequest request)
+        public async Task<ActionResult> DeleteCommentOnArticle(int articleId, UserSessionModel user, int commentId)
         {
             if (user is null)
                 throw new UnauthorizedUserException("you need to re-login");
@@ -88,10 +90,10 @@ namespace Domain.Services.CommentService
             if (!await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId))
                 throw new RecordNotFoundException("there is no article with the specified id");
 
-            if (!await _unitOfWork.Comments.DoesExistAsync(c => c.CommentId == request.commentId))
+            if (!await _unitOfWork.Comments.DoesExistAsync(c => c.CommentId == commentId))
                 throw new RecordNotFoundException("there is no comment with the specified id");
 
-            var comment = await _unitOfWork.Comments.GetAsync(request.commentId);
+            var comment = await _unitOfWork.Comments.GetAsync(commentId);
 
             if (user.UserId != comment.UserId)
                 throw new UnauthorizedUserException("you cant delete another user comment");

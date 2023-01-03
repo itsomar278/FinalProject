@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Domain.Models.DTO_s.RequestDto_s;
+using Domain.Models.DTO_s.ResponseDto_s;
 using Domain.Models.Requests;
 using Domain.Services.ArticleService;
 using FinalProject.DL.Exceptions;
@@ -24,7 +26,7 @@ namespace Domain.Services.ArticleService
             _mapper = mapper;
         }
 
-        public async Task<ActionResult> ArticlePartialUpdate(int articleId, JsonPatchDocument<ArticlePostRequest> patchDocument, UserSessionModel user)
+        public async Task<ActionResult> ArticlePartialUpdate(int articleId, JsonPatchDocument<ArticlePostRequestDto> patchDocument, UserSessionModel user)
         {
             if (user is null)
                 throw new UnauthorizedUserException("you need to relogin");
@@ -37,9 +39,9 @@ namespace Domain.Services.ArticleService
             if (user.UserId != articleToUpdate.UserId)
                 throw new UnauthorizedUserException("you cant upadte other users articles");
 
-            var articlePostRequest = _mapper.Map<ArticlePostRequest>(articleToUpdate);
-            patchDocument.ApplyTo(articlePostRequest);
-            _mapper.Map(articlePostRequest, articleToUpdate);
+            var articlePostRequestDto = _mapper.Map<ArticlePostRequestDto>(articleToUpdate);
+            patchDocument.ApplyTo(articlePostRequestDto);
+            _mapper.Map(articlePostRequestDto, articleToUpdate);
 
             await _unitOfWork.complete();
 
@@ -69,38 +71,38 @@ namespace Domain.Services.ArticleService
             return await Task.FromResult(new OkResult());
         }
 
-        public async Task<ArticleResponse> GetArticle(int articleId)
+        public async Task<ArticleResponseDto> GetArticle(int articleId)
         {
             if (!await _unitOfWork.Articles.DoesExistAsync(a => a.ArticleId == articleId))
                 throw new RecordNotFoundException("cannot find the specifed article");
 
             var article = await _unitOfWork.Articles.GetAsync(articleId);
             var user = await _unitOfWork.Users.GetAsync(article.UserId);
-            var response = _mapper.Map<ArticleResponse>((article, user));
+            var response = _mapper.Map<ArticleResponseDto>((article, user));
 
             return await Task.FromResult(response);
         }
 
 
-        public async Task<IEnumerable<ArticleResponse>> GetArticles(ArticlesSearchRequest articlesSearchRequest)
+        public async Task<IEnumerable<ArticleResponseDto>> GetArticles(ArticlesSearchRequestDto articlesSearchRequest)
         {
             var articles = await _unitOfWork.Articles.GetArticlesAsync(articlesSearchRequest.title, articlesSearchRequest.searchQuery, articlesSearchRequest.pageNumber, articlesSearchRequest.pageSize);
 
             if (articles.Count() == 0)
-               return Enumerable.Empty<ArticleResponse>();
+               return Enumerable.Empty<ArticleResponseDto>();
             
-            List<ArticleResponse> articleResponses = new List<ArticleResponse>();
+            List<ArticleResponseDto> articleResponses = new List<ArticleResponseDto>();
 
             foreach (var article in articles)
             {
                 var user = await _unitOfWork.Users.GetAsync(article.UserId);
-                var response = _mapper.Map<ArticleResponse>((article, user));
+                var response = _mapper.Map<ArticleResponseDto>((article, user));
                 articleResponses.Add(response);
             }
 
             return await Task.FromResult(articleResponses);
         }
-        public async Task<ActionResult> PostArticle(ArticlePostRequest request, UserSessionModel userFromSession)
+        public async Task<ActionResult> PostArticle(ArticlePostRequestDto request, UserSessionModel userFromSession)
         {
             if (userFromSession is null)
                throw new UnauthorizedUserException("you need to re-login");
