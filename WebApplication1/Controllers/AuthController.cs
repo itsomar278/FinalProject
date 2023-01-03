@@ -1,4 +1,5 @@
 using AutoMapper;
+using Domain.Models.DTO_s.RequestDto_s;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebApplication1.DataAccess.UnitOfWorks;
@@ -16,24 +17,29 @@ namespace WebApplication1.Controllers
         private readonly IAuthenticationService _authinticateService;
         private readonly ISessionDataManagment _sessionDataManagment;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public AuthController( IAuthenticationService authinticateService, ISessionDataManagment sessionDataManagment , IHttpContextAccessor httpContextAccessor)
+        private readonly IMapper _mapper;
+        public AuthController( IAuthenticationService authinticateService, ISessionDataManagment sessionDataManagment , IHttpContextAccessor httpContextAccessor
+            , IMapper mapper )
         {
             _authinticateService = authinticateService;
             _sessionDataManagment = sessionDataManagment;
             _httpContextAccessor = httpContextAccessor;
+            _mapper = mapper;
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<Users>> Rigester(UserRegisterRequest request)
+        public async Task<ActionResult> Rigester(UserRegisterRequest request)
         {
-            await _authinticateService.Register(request);
+            var requestDto = _mapper.Map<UserRegisterRequestDto>(request);
+            await _authinticateService.Register(requestDto);
             return Ok("user registerd successfully");
         }
 
         [HttpPost("login")]
         public async Task<ActionResult> Login(UserLoginRequest request)
         {
-            var token = await _authinticateService.login(request);
+            var requestDto = _mapper.Map<UserLoginRequestDto>(request);
+            var token = await _authinticateService.login(requestDto);
 
             var refreshToken = await _authinticateService.GenerateRefreshToken(request.UserEmail);
             var cookieOptions = new CookieOptions
@@ -89,16 +95,18 @@ namespace WebApplication1.Controllers
         [HttpPost("update-password"), Authorize]
         public async Task<ActionResult> UpdatePassword(UserPasswordUpdateRequest request)
         {
+            var requestDto = _mapper.Map<UserPasswordUpdateRequestDto>(request);
             var sessionUser = _sessionDataManagment.GetUserFromSession();
-            await _authinticateService.UpdatePassword(request, sessionUser);
+            await _authinticateService.UpdatePassword(requestDto, sessionUser);
             return Ok("Password updated successfully");
         }
 
         [HttpPost("update-userName"), Authorize]
         public async Task<ActionResult> UpdateUserName(UpdateUserNameRequest request)
         {
+            var requestDto = _mapper.Map<UpdateUserNameRequestDto>(request);
             var sessionUser = _sessionDataManagment.GetUserFromSession();
-            await _authinticateService.UpdateUserName(request, sessionUser);
+            await _authinticateService.UpdateUserName(requestDto, sessionUser);
             return Ok("User Name updated successfully");
         }
         

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Exceptions;
+using Domain.Models.DTO_s.RequestDto_s;
 using FinalProject.DL.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -76,12 +77,12 @@ namespace WebApplication1.Services.AuthService
 
             return await Task.FromResult(refreshToken);
         }
-        public async Task<ActionResult> Register(UserRegisterRequest request)
+        public async Task<ActionResult> Register(UserRegisterRequestDto request)
         {
             if ((await _unitOfWork.Users.DoesExistAsync(u => u.UserEmail == request.UserEmail)) ||
                 (await _unitOfWork.Users.DoesExistAsync(u => u.UserName == request.UserName)))
             {
-                throw new AlreadyExistingRecordException("Email or User Name has been used before"); // some sort of problem is here 
+                throw new AlreadyExistingRecordException("Email or User Name has been used before"); 
             }
 
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
@@ -91,7 +92,7 @@ namespace WebApplication1.Services.AuthService
 
             return await Task.FromResult(new OkResult());
         }
-        public async Task<string> login(UserLoginRequest request)
+        public async Task<string> login(UserLoginRequestDto request)
         {
             if (!await _unitOfWork.Users.DoesExistAsync(u => u.UserEmail == request.UserEmail))
                 throw new RecordNotFoundException("There is no user with such email address");
@@ -137,7 +138,7 @@ namespace WebApplication1.Services.AuthService
 
             return await Task.FromResult(new OkResult());
         }
-        public async Task<ActionResult> UpdatePassword(UserPasswordUpdateRequest request, UserSessionModel sessionUser)
+        public async Task<ActionResult> UpdatePassword(UserPasswordUpdateRequestDto request, UserSessionModel sessionUser)
         {
             var user = await _unitOfWork.Users.FindByEmailAsync(request.UserEmail);
             if (user == null)
@@ -159,7 +160,7 @@ namespace WebApplication1.Services.AuthService
 
             return await Task.FromResult(new OkResult());
         }
-        public async Task<ActionResult> UpdateUserName(UpdateUserNameRequest request, UserSessionModel sessionUser)
+        public async Task<ActionResult> UpdateUserName(UpdateUserNameRequestDto request, UserSessionModel sessionUser)
         {
             var user = await _unitOfWork.Users.FindByEmailAsync(request.UserEmail);
             if (user == null)
