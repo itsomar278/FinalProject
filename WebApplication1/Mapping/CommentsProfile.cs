@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
+using Contracts.Requests;
+using Contracts.Response;
 using DataAcess.Entites;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.DTO_s.ResponseDto_s;
-using WebApplication1.Requests;
-using WebApplication1.Response;
 
 namespace WebApplication1.Mapping
 {

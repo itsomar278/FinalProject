@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebApplication1.Requests
+namespace Contracts.Requests
 {
     public class AddToFavouritesRequest
     {

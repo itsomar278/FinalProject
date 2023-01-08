@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebApplication1.Response
+namespace Contracts.Response
 {
     public class UsersResponse
     {

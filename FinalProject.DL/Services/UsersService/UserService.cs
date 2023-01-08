@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DataAcess.Entites;
 using DataAcess.UnitOfWorks;
-using Domain.Exceptions;
+using Contracts.Exceptions;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Models.DTO_s.ResponseDto_s;
 using Domain.Services.SessionService;

@@ -1,11 +1,11 @@
 ﻿using AutoMapper;
+using Contracts.Requests;
+using Contracts.Response;
 using Domain.Models.DTO_s.RequestDto_s;
 using Domain.Services.SessionService;
 using Domain.Services.UsersService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using WebApplication1.Requests;
-using WebApplication1.Response;
 
 namespace WebApplication1.Controllers
 {

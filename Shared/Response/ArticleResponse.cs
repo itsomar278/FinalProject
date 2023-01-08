@@ -1,4 +1,4 @@
-﻿namespace WebApplication1.Response
+﻿namespace Contracts.Response
 {
     public class ArticleResponse
     {

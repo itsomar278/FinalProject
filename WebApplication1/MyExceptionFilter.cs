@@ -1,4 +1,4 @@
-﻿using Domain.Exceptions;
+﻿using Contracts.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using ILogger = Serilog.ILogger;
 
 namespace Domain
 {

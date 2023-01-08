@@ -1,6 +1,4 @@
-﻿
-
-namespace WebApplication1.Requests
+﻿namespace Contracts.Requests
 {
     public class PagingRequest
     {

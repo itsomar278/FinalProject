@@ -1,6 +1,4 @@
-﻿
-
-namespace Domain.Exceptions
+﻿namespace Contracts.Exceptions
 {
     public class RecordNotFoundException : Exception
     {

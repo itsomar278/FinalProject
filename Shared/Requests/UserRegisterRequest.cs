@@ -1,7 +1,6 @@
-
 using System.ComponentModel.DataAnnotations;
 
-namespace WebApplication1.Requests
+namespace Contracts.Requests
 {
     public class UserRegisterRequest
     {
@@ -16,7 +15,7 @@ namespace WebApplication1.Requests
         [Required, MinLength(8)]
         public string Password { get; set; } = string.Empty;
         [Required]
-        [Compare("Password" , ErrorMessage = " passwords dont match !") ]
+        [Compare("Password", ErrorMessage = " passwords dont match !")]
         public string PasswordConfirm { get; set; } = string.Empty;
 
     }

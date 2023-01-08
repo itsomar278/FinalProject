@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Contracts.Requests;
 using Domain.Models.DTO_s.RequestDto_s;
-using WebApplication1.Requests;
 
 namespace WebApplication1.Mapping
 {

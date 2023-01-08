@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace WebApplication1.Requests
+namespace Contracts.Requests
 {
     public class UserPasswordUpdateRequest
     {
@@ -11,7 +11,7 @@ namespace WebApplication1.Requests
         public string OldPassword { get; set; } = string.Empty;
         [Required, MinLength(8)]
         public string NewPassword { get; set; }
-        [Required, MinLength(8) , Compare("NewPassword")]
-        public string ConfirmPassword { get; set;}
+        [Required, MinLength(8), Compare("NewPassword")]
+        public string ConfirmPassword { get; set; }
     }
 }
